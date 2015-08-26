@@ -41,12 +41,87 @@ def get_info(symbol):
         if not title:
             title = 'Currency'
 
-        print tr
         marketdata[title.strip()] = value.strip().replace("*","")
     info['marketdata'] = marketdata
 
+    return info
+
+
+def getLSEInfo(query,collection=None):
+
+    def valid_str(input_str):
+        return input_str.strip().replace('.','')
+
+    header = {'User-Agent': 'Mozilla/5.0'}
+
+    info = {}
+
+    url = 'http://www.londonstockexchange.com/exchange/prices/stocks/summary/fundamentals.html?fourWayKey={}'
+    html = urllib2.urlopen(
+        urllib2.Request(
+            url.format(query),headers=header
+        )
+    )
+    soup = BeautifulSoup(html, 'html.parser')
+    try:
+        tIncome,tBalance,tRatio,tCompany,tTrading = soup.find_all('table')
+    except:
+        print 'Data not Available'
+        return info
+
+
+    # Income Table
+    detail = {}
+    for tr in tIncome.find('tbody').find_all('tr'):
+        tds = tr.find_all('td')
+        if len(tds) > 1:
+            index = valid_str(tds[0].string)
+            detail[index] = [td.string.strip() for td in tds[1:]]
+    info['Income'] = detail
+
+    # Balance Table
+    detail = {}
+    for tr in tBalance.find('tbody').find_all('tr'):
+        tds = tr.find_all('td')
+        if len(tds) > 1:
+            index = valid_str(tds[0].string)
+            detail[index] = [td.string.strip() for td in tds[1:]]
+    info['Balance'] = detail
+
+    # Ratio Table
+    detail = {}
+    for tr in tRatio.find('tbody').find_all('tr'):
+        tds = tr.find_all('td')
+        if len(tds) > 1:
+            index = valid_str(tds[0].string)
+            detail[index] = [td.string.strip() for td in tds[1:]]
+    info['Ratio'] = detail
+
+    # Company
+    detail = {}
+    for tr in tCompany.find('tbody').find_all('tr'):
+        tds = tr.find_all('td')
+        if len(tds) > 1:
+            index = valid_str(tds[0].string)
+            detail[index] = tds[-1].string.strip()
+    info['Company'] = detail
+
+    # Trading
+    detail = {}
+    for tr in tTrading.find('tbody').find_all('tr'):
+        tds = tr.find_all('td')
+        if len(tds) > 1:
+            index = valid_str(tds[0].string)
+            detail[index] = tds[-1].string.strip()
+    info['Trading'] = detail
+
+    if collection:
+        collection.update({
+            'query':query
+        },{'$set' : info})
 
     return info
 
+
 if __name__ == '__main__':
-    print json.dumps(get_info('III')['marketdata'])
+    print json.dumps(getLSEInfo('GB00BJTNFH41GBGBXSTMM'))
