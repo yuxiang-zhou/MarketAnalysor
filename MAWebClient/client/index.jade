@@ -132,10 +132,6 @@ template(name="notificationsElement")
         span.pull-right.text-muted.small #{when}
   li.divider
 
-template(name="container")
-  +sidebar
-  +page
-
 template(name="sidebar")
   .navbar-default.sidebar(role="navigation")
     .sidebar-nav.navbar-collapse
@@ -146,8 +142,8 @@ template(name="sidebar")
             span.input-group-btn
               button.btn.btn-default(type="button")
                 i.fa.fa-search
-          // /input-group
-        each navElements
+        // /input-group
+        each navRoutes
           +navElement
 
 template(name="navElement")
@@ -163,7 +159,6 @@ template(name="navElement")
         each children
           +navElement
 
-template(name="page")
-  // Put page title and breadcrumbs here with `Router.routes[Session.get('active')]`
+template(name='container')
+  +sidebar
   +yield
-

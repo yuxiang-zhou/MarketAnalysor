@@ -50,7 +50,15 @@ def get_info(symbol):
 def getLSEInfo(query,collection=None):
 
     def valid_str(input_str):
-        return input_str.strip().replace('.','')
+        input_str = re.sub('[^0-9a-zA-Z]+', '', input_str)
+        return input_str
+
+    def valid_num(input_str):
+        input_str = re.sub('[^0-9.-]+', '', input_str)
+
+        if len(input_str) and input_str != '-':
+            return float(input_str)
+        return 0.0
 
     header = {'User-Agent': 'Mozilla/5.0'}
 
@@ -76,7 +84,7 @@ def getLSEInfo(query,collection=None):
         tds = tr.find_all('td')
         if len(tds) > 1:
             index = valid_str(tds[0].string)
-            detail[index] = [td.string.strip() for td in tds[1:]]
+            detail[index] = [valid_num(td.string) for td in tds[1:]]
     info['Income'] = detail
 
     # Balance Table
@@ -85,7 +93,7 @@ def getLSEInfo(query,collection=None):
         tds = tr.find_all('td')
         if len(tds) > 1:
             index = valid_str(tds[0].string)
-            detail[index] = [td.string.strip() for td in tds[1:]]
+            detail[index] = [valid_num(td.string) for td in tds[1:]]
     info['Balance'] = detail
 
     # Ratio Table
@@ -94,7 +102,7 @@ def getLSEInfo(query,collection=None):
         tds = tr.find_all('td')
         if len(tds) > 1:
             index = valid_str(tds[0].string)
-            detail[index] = [td.string.strip() for td in tds[1:]]
+            detail[index] = [valid_num(td.string) for td in tds[1:]]
     info['Ratio'] = detail
 
     # Company
@@ -103,7 +111,7 @@ def getLSEInfo(query,collection=None):
         tds = tr.find_all('td')
         if len(tds) > 1:
             index = valid_str(tds[0].string)
-            detail[index] = tds[-1].string.strip()
+            detail[index] = valid_num(tds[-1].string) if 'Marketcap' in index else tds[-1].string
     info['Company'] = detail
 
     # Trading
@@ -112,8 +120,32 @@ def getLSEInfo(query,collection=None):
         tds = tr.find_all('td')
         if len(tds) > 1:
             index = valid_str(tds[0].string)
-            detail[index] = tds[-1].string.strip()
+            detail[index] = valid_num(tds[-1].string) if 'Exchange' in index else tds[-1].string
     info['Trading'] = detail
+
+    # Get Spread 
+    url = 'http://www.londonstockexchange.com/exchange/prices-and-markets/stocks/summary/company-summary/{}.html'
+    html = urllib2.urlopen(
+        urllib2.Request(
+            url.format(query),headers=header
+        )
+    )
+    soup = BeautifulSoup(html, 'html.parser')
+    try:
+        tSummary = soup.find_all('table')[0]
+    except:
+        print 'Data not Available'
+        return info
+
+    detail = {}
+    for tr in tSummary.find('tbody').find_all('tr'):
+        tds = tr.find_all('td')
+        if len(tds) > 1:
+            for index, value in zip(tds[0::2],tds[1::2]):
+                index = valid_str(index.string)
+                detail[index] = value.string if 'Var' in index or 'Last' in index or 'status' in index or 'Special' in index or index == '' else valid_num(value.string)
+    info['Summary'] = detail
+
 
     if collection:
         collection.update({
