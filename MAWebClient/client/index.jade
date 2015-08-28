@@ -9,9 +9,9 @@ template(name="head")
     meta(charset="utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge")
     meta(name="viewport", content="width=device-width, initial-scale=1")
-    meta(name="description", content="")
-    meta(name="author", content="")
-    title SB Admin 2 Meteor
+    meta(name="description", content="Gambling!!!")
+    meta(name="author", content="Yuxiang ZHOU")
+    title Market Analysor
 
 template(name="topbar")
   #wrapper
@@ -23,10 +23,12 @@ template(name="topbar")
           span.icon-bar
           span.icon-bar
           span.icon-bar
-        a.navbar-brand(href="/") SB Admin v2.0
+        a.navbar-brand(href="/") Market Analysor
       // /.navbar-header
       ul.nav.navbar-top-links.navbar-right
-        li.dropdown
+        li
+          +loginButtons
+        li.dropdown.active
           a.dropdown-toggle(data-toggle="dropdown", href="#")
             i.fa.fa-envelope.fa-fw
             i.fa.fa-caret-down
