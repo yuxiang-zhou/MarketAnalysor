@@ -146,6 +146,20 @@ def getLSEInfo(query,collection=None):
                 detail[index] = value.string if 'Var' in index or 'Last' in index or 'status' in index or 'Special' in index or index == '' else valid_num(value.string)
     info['Summary'] = detail
 
+    stats = {}
+    # DATA orgainising --------------------------
+    stats['MarketCap'] = info['Company']['Marketcapinmillions']
+    stats['Profit'] = info['Income']['ProfitBeforeTax'][-1]
+    stats['MPRatio'] = stats['MarketCap'] / stats['Profit'] if stats['Profit'] > 0 else 999
+    stats['PE'] = info['Ratio']['PERatioAdjusted'][-1]
+    stats['EMS'] = info['Trading']['Exchangemarketsize']
+    offer = info['Summary']['Offer']
+    bid = info['Summary']['Bid']
+    stats['Spread'] = 100 * (offer - bid) / bid if bid > 0 else 99
+    stats['Dividend'] = info['Ratio']['DividendYield'][-1]
+    stats['NetDebt'] = info['Balance']['Borrowings'][-1]
+    # -------------------------------------------
+    info['stats'] = stats
 
     if collection:
         collection.update({

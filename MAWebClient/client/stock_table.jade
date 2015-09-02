@@ -1,11 +1,14 @@
 template(name="stock_table")
   #page-wrapper
     .row
-        .col-lg-12
-          h1.page-header Stock Tables
+      .col-lg-12
+        h1.page-header Stock Tables
+    .row
+      .col-lg-12
+        input#stockFilter(type="checkbox", name="stockFilter", checked)
+        span Apply Basis Filter
     +stocklist(index='FTSE All-Share')
     +stocklist(index='FTSE AIM All-Share')
-  // /#page-wrapper
 
 template(name='stocklist')
   .row
@@ -38,12 +41,12 @@ template(name='stockHeader')
   tr
     th Symbol
     th Name
-    th Market Cap.
+    th Market Cap. (£ m)
     th Profit
     th M/P Ratio
     th P/E
     th EMS
-    th Spread
+    th Spread (%)
     th Dividend
     th Net Debt
 
@@ -52,11 +55,11 @@ template(name='stockEntry')
   tr
     td #{symbol}
     td #{name}
-    td #{MarketCap}
-    td #{Profit}
-    td #{MPRatio}
-    td #{PE}
-    td #{EMS}
-    td #{Spread}
-    td #{Dividend}
-    td #{NetDebt}
+    td #{stats.MarketCap}
+    td #{stats.Profit}
+    td #{stats.MPRatio}
+    td #{stats.PE}
+    td #{stats.EMS}
+    td #{stats.Spread}
+    td #{stats.Dividend}
+    td #{stats.NetDebt}
