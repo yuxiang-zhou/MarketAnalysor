@@ -1,8 +1,13 @@
+fieldNoHistory = {'fields': {'history':0}}
+
 Meteor.publish "stocksFTSE", ->
-  return StockDB.find({"Trading.FTSEindex": {"$regex":".*FTSE.*"}})
+  return StockDB.find({"Trading.FTSEindex": {"$regex":".*FTSE All-Share.*"}}, fieldNoHistory)
+
+Meteor.publish "stocksFTSEAIM", ->
+  return StockDB.find({"Trading.FTSEindex": {"$regex":".*AIM.*"}}, fieldNoHistory)
 
 Meteor.publish "stocksall", ->
-  return StockDB.find()
+  return StockDB.find({}, fieldNoHistory)
 
   # MarketCap: ->
   #   mc = @Company.Marketcapinmillions
