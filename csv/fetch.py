@@ -3,6 +3,7 @@ import threading
 from bs4 import BeautifulSoup
 import re
 import json
+import sys
 
 from stock_list import getlist, getLSEList
 from extract_stock_info import get_info, getLSEInfo
@@ -48,14 +49,22 @@ from pymongo import MongoClient
                 
 if __name__ == '__main__':
     # Connect MongoDB
+    host = 'localhost'
+    port = 27017
+    if len(sys.argv) > 1:
+        host = sys.argv[1]
+    if len(sys.argv) > 2:
+        port = int(sys.argv[2])
+
     try:
         print 'Try connecting db...'
-        client = MongoClient('localhost', 3001)
+        client = MongoClient("mongodb://"+host, port)
         print 'Done.'
         db = client.meteor
         stockDB = db.stock
     except:
-        print 'Connection Failed!'
+        print "Unexpected error:", sys.exc_info()[0]
+        exit()
 
     
 

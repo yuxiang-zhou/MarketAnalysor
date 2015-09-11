@@ -158,6 +158,15 @@ def getLSEInfo(query,collection=None):
     stats['Spread'] = 100 * (offer - bid) / bid if bid > 0 else 99
     stats['Dividend'] = info['Ratio']['DividendYield'][-1]
     stats['NetDebt'] = info['Balance']['Borrowings'][-1]
+    try:
+        stats['Price'] = info['Summary']['PriceGBX']
+    except:
+        stats['Price'] = 0
+        print 'Price is not GBP'
+    stats['Bid'] = info['Summary']['Bid']
+    stats['Offer'] = info['Summary']['Offer']
+    stats['Liquidity'] = stats['EMS'] * stats['Price'] / 100.0
+    stats['DPRatio'] = stats['NetDebt'] / stats['Profit'] * -1.0 if stats['Profit'] != 0 else 3
     # -------------------------------------------
     info['stats'] = stats
 

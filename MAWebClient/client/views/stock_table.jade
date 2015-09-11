@@ -19,7 +19,7 @@ template(name='stocklist')
         // /.panel-heading
         .panel-body
           .table-responsive
-            table.table.table-striped.table-bordered.table-hover
+            table#stockTable.table.table-striped.table-bordered.table-hover
               thead
                 +stockHeader
               tbody
@@ -42,24 +42,24 @@ template(name='stockHeader')
     th Symbol
     th Name
     th Market Cap. (£ m)
-    th Profit
+    th Profit (£ m)
     th M/P Ratio
     th P/E
-    th EMS
-    th Spread (%)
-    th Dividend
-    th Net Debt
+    th EMS - Liquidity (£)
+    th Price (£ p) - Spread (%)
+    th Dividend (£ p)
+    th Net Debt (£ m) - D/P Ratio
 
 
 template(name='stockEntry')
-  tr
-    td #{symbol}
-    td #{name}
-    td #{stats.MarketCap}
-    td #{stats.Profit}
-    td #{stats.MPRatio}
-    td #{stats.PE}
-    td #{stats.EMS}
-    td #{stats.Spread}
-    td #{stats.Dividend}
-    td #{stats.NetDebt}
+  tr.clickable-row
+    td {{symbol}}
+    td {{name}}
+    td {{numFormat stats.MarketCap 2}}
+    td {{numFormat stats.Profit 2}}
+    td {{numFormat stats.MPRatio 1}}
+    td {{numFormat stats.PE 1}}
+    td {{numFormat stats.EMS 0}} - {{numFormat stats.Liquidity 0}}
+    td {{numFormat stats.Bid 1}} - {{numFormat stats.Offer 1}} ({{numFormat stats.Spread 3}})
+    td {{numFormat stats.Dividend 2}}
+    td {{numFormat stats.NetDebt 2}} - {{numFormat stats.DPRatio 2}}
