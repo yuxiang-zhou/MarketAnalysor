@@ -36,11 +36,14 @@ Template.topbar.events(
 )
 
 Template.sidebar.helpers(
-  navRoutes: () ->
+  navRoutes:  ->
     return navElements
+
+  indexRoutes: ->
+    return Session.get('IndexElements')
 )
 
-Template.sidebar.rendered = () ->
+Template.sidebar.onRendered ->
   $('#side-menu').metisMenu()
 
 Template.navElement.helpers(

@@ -1,0 +1,46 @@
+template(name="stockdetail")
+  #page-wrapper
+    .row
+      .col-lg-12
+        h1.page-header 
+          b #{symbol}
+          | : #{name}
+    .row
+      .col-lg-4
+        b #{stats.Price}
+      .col-lg-4
+        i Market Cap.: £#{stats.MarketCap}(M)
+      .col-lg-4
+        i EMS: #{stats.EMS}
+
+    .row
+      .col-lg-4
+        i Range: #{stats.Bid}p (bid) - #{stats.Offer}p (offer)
+      .col-lg-4
+        i Profit: £#{stats.Profit}(M)
+      .col-lg-4
+        i Liquidity: £#{stats.Liquidity}
+
+    .row
+      .col-lg-4
+        i Spread: {{numFormat stats.Spread 2}}%
+      .col-lg-4
+        i M/P Ratio: {{numFormat stats.MPRatio 2}}
+      .col-lg-4
+        i Dividend: #{stats.Dividend}p
+
+    .row
+      .col-lg-12
+        h3.page-header Chart
+        #candlestickChartContainer
+        #volumnChartContainer
+    .row
+      .col-lg-12
+        h3.page-header Info
+        p Address: #{Company.Companyaddress}
+        p IPO: #{Company.ListingAdmissiontotrading}
+        
+    .row
+      .col-lg-12
+        h3.page-header Analysis
+        

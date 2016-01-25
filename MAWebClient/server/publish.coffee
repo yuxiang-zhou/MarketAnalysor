@@ -1,4 +1,14 @@
-fieldNoHistory = {'fields': {'history':0}}
+fieldNoHistory = {
+  'fields': {
+    'symbol': 1,
+    'name': 1,
+    'query': 1,
+    'stats': 1,
+    'Company': 1,
+    'Trading.FTSEindex': 1
+  }
+}
+
 
 Meteor.publish "stocksFTSE", ->
   return StockDB.find({"Trading.FTSEindex": {"$regex":".*FTSE All-Share.*"}}, fieldNoHistory)

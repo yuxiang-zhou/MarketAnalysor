@@ -145,7 +145,8 @@ template(name="sidebar")
         // /input-group
         each navRoutes
           +navElement
-
+        each indexRoutes
+          +navElement
 template(name="navElement")
   li
     a(href=path class=isActive)

@@ -1,3 +1,27 @@
+# Gloval Route Class def
+
+class Navigation
+
+  getStruct: ->
+    return @struct
+
+  constructor: (route,path,icon,label,params) ->
+    @struct = {}
+    @struct.route = route
+    @struct.path = path
+    @struct.icon = icon
+    @struct.label = label
+    @struct.params = params
+    @struct.params.path = path
+    @struct.params.name = label.replace(" ", "");
+    @struct.children=[]
+
+  addChild: (instNavi) ->
+    @struct.children.push(instNavi.getStruct())
+    return this
+@Navigation = Navigation
+
+
 
 ###
 #  Global Route Configuration
@@ -9,44 +33,33 @@ Router.configure
 
 # # we always need to wait on these publications
 # Router.waitOn ->
-#   @subscribe "stocks"
+#   @subscribe "stocksall"
+#   @subscribe "stocksFTSE"
+#   @subscribe "stocksFTSEAIM"
 #   @subscribe "Packages"
 
 # general reaction controller
-@StockController = RouteController.extend
+@PageController = RouteController.extend
   layoutTemplate: "mainLayout"
   onBeforeAction: ->
     Session.set 'active', @url
     @next()
 # local ShopController
-StockController = @StockController
+PageController = @PageController
+
 
 # Global NaviList
-
 @navElements = []
-@navElements.push
-  route: 'index'
-  path: '/'
-  icon: 'fa-dashboard'
-  label: 'Dashboard'
-  params:
-    controller: StockController
-    path: "/"
-    name: "Dashboard"
-    template: "summary"
-
-@navElements.push
-  route: 'stock'
-  label: 'Stock Details'
-  path: '/stock'
-  icon: 'fa-table'
-  params:
-    controller: StockController
-    path: "/stock"
-    name: "StockDetails"
-    template: "stock_table"
-    subscriptions: ->
-      @subscribe "stocksall"
+@navElements.push(
+    new Navigation('index','/','fa-dashboard','Dashboard',{controller: PageController, template: "summary"}).getStruct()
+  )
+@navElements.push(
+    new Navigation('stock','/stock','fa-table','Stock Details',{controller: PageController, template: "stock_table", waitOn:-> return @subscribe 'stocksall'}).addChild(
+      new Navigation('stock','/stock-ftse','fa-table','FTSE ALL Share',{controller: PageController, template: "stock_table", waitOn:-> return @subscribe 'stocksFTSE'})
+    ).addChild(
+      new Navigation('stock','/stock-aim','fa-table','FTSE AIM ALL Share',{controller: PageController, template: "stock_table", waitOn:-> return @subscribe 'stocksFTSEAIM'})
+    ).getStruct()
+  )
 
 navElements = @navElements
 
@@ -55,5 +68,26 @@ navElements = @navElements
 ###
 Router.map ->
   # default index route, normally overriden parent meteor app
-  for nav in navElements
-    @route nav.route, nav.params
+  that = this
+  addNavigation = (navs) ->
+    for nav in navs
+      that.route nav.route, nav.params
+      addNavigation(nav.children)
+
+  addNavigation(navElements)
+
+  # Router for displaying details stock information
+  @route 'stockdetail',
+    controller: PageController
+    path: "/stockdetail/:symbol"
+    name: "stockdetail"
+    template: "stockdetail"
+    waitOn:->
+      return @subscribe 'stocksall'
+    data: ->
+      return StockDB.findOne({"symbol":@params.symbol})
+
+  @route '/api/history/:symbol', (->
+      data = StockDBHist.find({"symbol":@params.symbol}).fetch()
+      @response.end JSON.stringify(data)
+    ), {where: 'server'}
