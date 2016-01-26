@@ -39,7 +39,9 @@ template(name='stockHeader')
     th Price (£ p) - Spread (%)
     th Dividend (£ p)
     th Net Debt (£ m) - D/P Ratio
-
+    th Profit Trend
+    th Divident Trend
+    th Debt Trend
 
 template(name='stockEntry')
   tr.clickable-row
@@ -53,3 +55,7 @@ template(name='stockEntry')
     td {{numFormat stats.Bid 1}} - {{numFormat stats.Offer 1}} ({{numFormat stats.Spread 3}})
     td {{numFormat stats.Dividend 2}}
     td {{numFormat stats.NetDebt 2}} - {{numFormat stats.DPRatio 2}}
+    td {{numFormat stats.ProfitTrend 2}}
+    td {{numFormat stats.DividentTrend 2}}
+    td {{numFormat stats.NetDebtTrend 2}}
+    

@@ -1,18 +1,27 @@
 @BasicStockFilter = BasicStockFilter =
   'stats.MarketCap':
-    $gt:
+    $gte:
       49
-    $lt:
+    $lte:
       1000
   'stats.MPRatio':
-    $lt:
+    $lte:
       20
   'stats.Spread':
-    $lt:
+    $lte:
       3
   'stats.Liquidity':
-    $gt:
+    $gte:
       2000
+  'stats.ProfitTrend':
+    $gt:
+      0
+  'stats.DividentTrend':
+    $gt:
+      0
+  'stats.NetDebtTrend':
+    $gte:
+      0
   # 'stats.PE':
   #   $lt:
   #     20
