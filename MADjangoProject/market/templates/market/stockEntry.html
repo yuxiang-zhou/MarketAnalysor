@@ -1,0 +1,16 @@
+{% load humanize %}
+<tr class="clickable-row" onclick="location.href='{% url 'market:detail' obj.Symbol %}';">
+  <td>{{obj.Symbol}}</td>
+  <td>{{obj.Name}}</td>
+  <td>{{obj.MarketCap}}</td>
+  <td>{{obj.Profit}}</td>
+  <td>{{obj.MPRatio|floatformat:2}}</td>
+  <td>{{obj.PE|floatformat:2}}</td>
+  <td>{{obj.EMS|floatformat:2}} - {{obj.Liquidity|floatformat:0}}</td>
+  <td>{{obj.Bid|floatformat:1}} - {{obj.Offer|floatformat:1}} ({{obj.Spread|floatformat:2}})</td>
+  <td>{{obj.Dividend|floatformat:2}}</td>
+  <td>{{obj.NetDebt|floatformat:2}} - {{obj.DPRatio|floatformat:2}}</td>
+  <td>{{obj.ProfitTrend|floatformat:2}}</td>
+  <td>{{obj.DividendTrend|floatformat:2}}</td>
+  <td>{{obj.DebtTrend|floatformat:2}}</td>
+</tr>

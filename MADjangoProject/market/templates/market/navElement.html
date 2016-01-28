@@ -1,0 +1,15 @@
+<li>
+  <a href={{navElem.path}} class={{navElem.isActive}}>
+    <i class="fa fa-fw {{navElem.icon}}"></i>{{navElem.label}}
+    {% if navElem.children %}
+      <span class="fa arrow"></span>
+    {% endif %}
+  </a>
+  {% if navElem.children %}
+    <ul class="nav nav-second-level">
+      {% for child in navElem.children %}
+        {% include 'market/navElement.html' with navElem=child %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+</li>

@@ -1,0 +1,21 @@
+{% extends "market/template.html" %}
+{% block content %}
+<div id="page-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Stock Tables</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <input id="stockFilter" type="checkbox" name="stockFilter" checked="undefined"/><span>Apply Basis Filter</span>
+    </div>
+  </div>
+  {% if StockFTSEALL %}
+    {% include 'market/stocklist.html' with index='FTSE All-Share' Stocklist=StockFTSEALL %}
+  {% endif %}
+  {% if StockFTSEAIMALL %}
+    {% include 'market/stocklist.html' with index='FTSE AIM All-Share' Stocklist=StockFTSEAIMALL %}
+  {% endif %}
+</div>
+{% endblock %}

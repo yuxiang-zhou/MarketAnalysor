@@ -1,0 +1,127 @@
+{% extends "market/template.html" %}
+{% load staticfiles%}
+{% block scripts %}
+<script type="text/javascript">
+  var jqxhr = $.getJSON("{% url 'market:history' stockdetail.Symbol %}", function(data) {
+    var candlestickChart, h, hist_volumn, history, i, len, strDate, volumnChart;
+
+    history = [];
+    hist_volumn = [];
+
+    for (i = 0, len = data.length; i < len; i++) {
+      h = data[i]['fields'];
+      strDate = new Date(Date.parse(h.pub_date));
+      history.push({
+        x: strDate,
+        y: [h.Open, h.High, h.Low, h.Close]
+      });
+      hist_volumn.push({
+        x: strDate,
+        y: h.Volumn
+      });
+    }
+
+    candlestickChart = new CanvasJS.Chart("candlestickChartContainer", {
+      title: {
+        text: "Candle Stick Chart: {{stockdetail.Symbol}}"
+      },
+      zoomEnabled: true,
+      backgroundColor: "",
+      axisY: {
+        includeZero: false,
+        title: "Prices",
+        prefix: " ",
+        suffix: " p",
+        labelFontSize: 12,
+        valueFormatString: "0000"
+      },
+      axisX: {
+        interval: 2,
+        labelFontSize: 12,
+        intervalType: "month",
+        valueFormatString: "MMM-YY",
+        labelAngle: -45
+      },
+      data: [
+        {
+          type: "candlestick",
+          risingColor: "#EDCDFF",
+          color: "#9A65AB",
+          dataPoints: history
+        }
+      ]
+    });
+    candlestickChart.render();
+    volumnChart = new CanvasJS.Chart("volumnChartContainer", {
+      zoomEnabled: true,
+      backgroundColor: "",
+      axisY: {
+        includeZero: false,
+        title: "Volumn",
+        labelFontSize: 12,
+        valueFormatString: "00.0E+0"
+      },
+      axisX: {
+        interval: 2,
+        intervalType: "month",
+        valueFormatString: "MMM-YY",
+        labelAngle: -45,
+        labelFontSize: 12
+      },
+      data: [
+        {
+          dataPoints: hist_volumn,
+          color: "#EDCDFF"
+        }
+      ]
+    });
+    volumnChart.render();
+    return console.log(volumnChart);
+  }).fail(function() {
+    return console.log('Faild to retrieve history');
+  });
+</script>
+{% endblock %}
+{% block content %}
+<div id="page-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header"> <b>{{stockdetail.Symbol}}</b>: {{stockdetail.Name}}</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><b>{{stockdetail.Price}}</b></div>
+    <div class="col-lg-4"><i>Market Cap.: £{{stockdetail.MarketCap}}(M)</i></div>
+    <div class="col-lg-4"><i>EMS: {{stockdetail..EMS}}</i></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><i>Range: {{stockdetail.Bid}}p (bid) - {{stockdetail.Offer}}p (offer)</i></div>
+    <div class="col-lg-4"><i>Profit: £{{stockdetail.Profit}}(M)</i></div>
+    <div class="col-lg-4"><i>Liquidity: £{{stockdetail.Liquidity}}</i></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><i>Spread: {{stockdetail.Spread|floatformat:2}}%</i></div>
+    <div class="col-lg-4"><i>M/P Ratio: {{stockdetail.MPRatio|floatformat:2}}</i></div>
+    <div class="col-lg-4"><i>Dividend: {{stockdetail.Dividend}}p</i></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-12">
+      <h3 class="page-header">Chart</h3>
+      <div id="candlestickChartContainer"></div>
+      <div id="volumnChartContainer"></div>
+    </div>
+  </div>
+  <!-- <div class="row">
+    <div class="col-lg-12">
+      <h3 class="page-header">Info</h3>
+      <p>Address: {Company.Companyaddress}</p>
+      <p>IPO: {Company.ListingAdmissiontotrading}</p>
+    </div>
+  </div> -->
+  <div class="row">
+    <div class="col-lg-12">
+      <h3 class="page-header">Analysis</h3>
+    </div>
+  </div>
+</div>
+{% endblock %}

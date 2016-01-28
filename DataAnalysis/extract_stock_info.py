@@ -3,6 +3,8 @@ import threading
 from bs4 import BeautifulSoup
 import re
 import json
+from django.utils import timezone
+from tools import get_slope
 
 def get_info(symbol):
     info_query = 'https://www.google.co.uk/finance?q={}'
@@ -12,7 +14,7 @@ def get_info(symbol):
     soup = BeautifulSoup(html, 'html.parser')
     content = soup.find('div', class_='g-wrap')
     news = soup.find_all('script')
-    
+
     # parse news
     newsdata=""
     for script in news:
@@ -32,7 +34,7 @@ def get_info(symbol):
     marketdata = {}
     market_data_div = content.find('div', id='market-data-div')
     marketdata['price'] = "".join([sp.string for sp in market_data_div.find('span', class_='pr').find_all('span')])
-    
+
     pricechange = content.find('div', class_='id-price-change').find('span')
     marketdata['pricechange'], marketdata['pricechangepercent'] = [sp.string for sp in pricechange.find_all('span')]
 
@@ -123,7 +125,7 @@ def getLSEInfo(query,collection=None):
             detail[index] = valid_num(tds[-1].string) if 'Exchange' in index else tds[-1].string
     info['Trading'] = detail
 
-    # Get Spread 
+    # Get Spread
     url = 'http://www.londonstockexchange.com/exchange/prices-and-markets/stocks/summary/company-summary/{}.html'
     html = urllib2.urlopen(
         urllib2.Request(
@@ -171,9 +173,26 @@ def getLSEInfo(query,collection=None):
     info['stats'] = stats
 
     if collection:
-        collection.update({
-            'query':query
-        },{'$set' : info})
+        obj, created = collection.objects.get_or_create(Query=query)
+        obj.MarketCap = stats['MarketCap']
+        obj.Profit = stats['Profit']
+        obj.MPRatio = stats['MPRatio']
+        obj.PE = stats['PE']
+        obj.EMS = stats['EMS']
+        obj.Bid = stats['Bid']
+        obj.Offer = stats['Offer']
+        obj.Spread = stats['Spread']
+        obj.Price = stats['Price']
+        obj.Dividend = stats['Dividend']
+        obj.NetDebt = stats['NetDebt']
+        obj.Liquidity = stats['Liquidity']
+        obj.DPRatio = stats['DPRatio']
+        obj.Sector = info['Trading']['FTSEsector']
+        obj.Catagory = info['Trading']['FTSEindex']
+        obj.ProfitTrend = get_slope(info['Income']['ProfitBeforeTax'])
+        obj.DividendTrend = get_slope(info['Ratio']['DividendYield'])
+        obj.DebtTrend = get_slope(info['Balance']['Borrowings'])
+        obj.save()
 
     return info
 

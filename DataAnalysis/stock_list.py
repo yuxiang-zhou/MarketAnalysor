@@ -1,13 +1,14 @@
 import urllib2
 import threading
 import json
+from django.utils import timezone
 from bs4 import BeautifulSoup
 
 # stock list
 def getlist(stock):
     stocks = []
     stock_list_query = 'http://shareprices.com/{}'
-    
+
     html = urllib2.urlopen(stock_list_query.format(stock)).read()
 
     soup = BeautifulSoup(html, 'html.parser')
@@ -67,9 +68,11 @@ def getLSEList(collection=None):
                 lists.append(info)
 
                 if collection:
-                    collection.update({
-                        'symbol':info['symbol']
-                    },{'$set' : info},upsert=True)
+                    obj, created = collection.objects.get_or_create(Symbol=info['symbol'])
+                    obj.Query = info['query']
+                    obj.Name = info['name']
+                    obj.update_date = timezone.now()
+                    obj.save()
 
         return lists
 

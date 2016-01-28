@@ -1,0 +1,54 @@
+<div id="wrapper">
+  <!-- Navigation-->
+  <nav role="navigation" style="margin-bottom: 0" class="navbar navbar-default navbar-static-top">
+    <div class="navbar-header">
+      <button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="/" class="navbar-brand">Market Analysor</a>
+    </div>
+    <!-- /.navbar-header-->
+    <ul class="nav navbar-top-links navbar-right">
+      <li>
+        login buttons here
+      </li>
+      <li class="dropdown active"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i></a>
+        <ul class="dropdown-menu dropdown-messages">
+          {% include 'market/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
+          {% include 'market/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
+          {% include 'market/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
+          <li><a href="#" class="text-center"><strong>Read All Messages</strong><i class="fa fa-angle-right"></i></a></li>
+        </ul>
+        <!-- /.dropdown-messages-->
+      </li>
+      <!-- /.dropdown-->
+      <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-tasks fa-fw"></i><i class="fa fa-caret-down"></i></a>
+        <ul class="dropdown-menu dropdown-tasks">
+          {% include 'market/taskDropdownElement.html' with task='task' percentComplete=60 type=1 %}
+          {% include 'market/taskDropdownElement.html' with task='task' percentComplete=10 type=2 %}
+          {% include 'market/taskDropdownElement.html' with task='task' percentComplete=90 type=3 %}
+          <li><a href="#" class="text-center"><strong>See All Tasks</strong><i class="fa fa-angle-right"></i></a></li>
+        </ul>
+        <!-- /.dropdown-tasks-->
+      </li>
+      <!-- /.dropdown-->
+      <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-bell fa-fw"></i><i class="fa fa-caret-down"></i></a>
+        <ul class="dropdown-menu dropdown-alerts">
+          {% include 'market/notificationsElement.html' with text='notification' when='sometime' %}
+          <li><a href="#" class="text-center"><strong>See All Alerts</strong><i class="fa fa-angle-right"></i></a></li>
+        </ul>
+        <!-- /.dropdown-alerts-->
+      </li>
+      <!-- /.dropdown-->
+      <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-user fa-fw"></i><i class="fa fa-caret-down"></i></a>
+        <ul class="dropdown-menu dropdown-user">
+          <li><a href="#"><i class="fa fa-user fa-fw"></i>User Profile</a></li>
+          <li><a href="#"><i class="fa fa-gear fa-fw"></i>Settings</a></li>
+          <li class="divider"></li>
+          <li><a id="sign-out" href="#"><i class="fa fa-sign-in fa-fw"></i>Sign Out</a></li>
+          <li><a id="login" href="#"><i class="fa fa-sign-in fa-fw"></i>Login</a></li>
+        </ul>
+        <!-- /.dropdown-user-->
+      </li>
+      <!-- /.dropdown-->
+    </ul>
+    <!-- /.navbar-top-links-->
+  </nav>
+</div>

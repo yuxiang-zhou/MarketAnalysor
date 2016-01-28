@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include "market/head.html" %}
+
+    <title> {% block title %} Share Market Analysis {% endblock %}</title>
+  </head>
+
+  <body>
+    {% include "market/top_bar.html" %}
+    {% include "market/side_bar.html" with navRoutes=navRoutes %}
+    {% block content %} Template Content {% endblock %}
+    {% include "market/scripts.html" %}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
