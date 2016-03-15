@@ -6,14 +6,11 @@
     </div>
     <!-- /.navbar-header-->
     <ul class="nav navbar-top-links navbar-right">
-      <li>
-        login buttons here
-      </li>
       <li class="dropdown active"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-envelope fa-fw"></i><i class="fa fa-caret-down"></i></a>
         <ul class="dropdown-menu dropdown-messages">
-          {% include 'market/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
-          {% include 'market/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
-          {% include 'market/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
+          {% include 'market/components/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
+          {% include 'market/components/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
+          {% include 'market/components/emailDropdownElement.html' with name='Yuxiang' when='sometime' summary='summary' %}
           <li><a href="#" class="text-center"><strong>Read All Messages</strong><i class="fa fa-angle-right"></i></a></li>
         </ul>
         <!-- /.dropdown-messages-->
@@ -21,9 +18,9 @@
       <!-- /.dropdown-->
       <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-tasks fa-fw"></i><i class="fa fa-caret-down"></i></a>
         <ul class="dropdown-menu dropdown-tasks">
-          {% include 'market/taskDropdownElement.html' with task='task' percentComplete=60 type=1 %}
-          {% include 'market/taskDropdownElement.html' with task='task' percentComplete=10 type=2 %}
-          {% include 'market/taskDropdownElement.html' with task='task' percentComplete=90 type=3 %}
+          {% include 'market/components/taskDropdownElement.html' with task='task' percentComplete=60 type=1 %}
+          {% include 'market/components/taskDropdownElement.html' with task='task' percentComplete=10 type=2 %}
+          {% include 'market/components/taskDropdownElement.html' with task='task' percentComplete=90 type=3 %}
           <li><a href="#" class="text-center"><strong>See All Tasks</strong><i class="fa fa-angle-right"></i></a></li>
         </ul>
         <!-- /.dropdown-tasks-->
@@ -31,19 +28,22 @@
       <!-- /.dropdown-->
       <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-bell fa-fw"></i><i class="fa fa-caret-down"></i></a>
         <ul class="dropdown-menu dropdown-alerts">
-          {% include 'market/notificationsElement.html' with text='notification' when='sometime' %}
+          {% include 'market/components/notificationsElement.html' with text='notification' when='sometime' %}
           <li><a href="#" class="text-center"><strong>See All Alerts</strong><i class="fa fa-angle-right"></i></a></li>
         </ul>
         <!-- /.dropdown-alerts-->
       </li>
       <!-- /.dropdown-->
-      <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-user fa-fw"></i><i class="fa fa-caret-down"></i></a>
+      <li class="dropdown"><a data-toggle="dropdown" href="#" class="dropdown-toggle"><i class="fa fa-user fa-fw"></i>&nbsp;{{request.user.username}}&nbsp;<i class="fa fa-caret-down"></i></a>
         <ul class="dropdown-menu dropdown-user">
-          <li><a href="#"><i class="fa fa-user fa-fw"></i>User Profile</a></li>
-          <li><a href="#"><i class="fa fa-gear fa-fw"></i>Settings</a></li>
-          <li class="divider"></li>
-          <li><a id="sign-out" href="#"><i class="fa fa-sign-in fa-fw"></i>Sign Out</a></li>
-          <li><a id="login" href="#"><i class="fa fa-sign-in fa-fw"></i>Login</a></li>
+          {% if request.user.is_active %}
+            <li><a href="{% url 'market:account' %}"><i class="fa fa-user fa-fw"></i>User Profile</a></li>
+            <li><a href="#"><i class="fa fa-gear fa-fw"></i>Settings</a></li>
+            <li class="divider"></li>
+            <li><a id="sign-out" href="#"><i class="fa fa-sign-in fa-fw"></i>Sign Out</a></li>
+          {% else %}
+            <li><a id="login" href="#"><i class="fa fa-sign-in fa-fw"></i>Login</a></li>
+          {% endif %}
         </ul>
         <!-- /.dropdown-user-->
       </li>

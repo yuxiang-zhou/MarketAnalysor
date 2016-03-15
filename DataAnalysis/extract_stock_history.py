@@ -33,6 +33,7 @@ def get_historical_info(symbol,collection=None):
 
     # String Formating
     data = [i.split(',') for i in history_str.splitlines()]
+
     history = []
     if data:
         labels = data[0]
@@ -57,7 +58,7 @@ def get_historical_info(symbol,collection=None):
 
                 obj_hist.save()
 
-            print 'Data Stored'
+            print '{} Data Stored'.format(len(history))
 
 
 

@@ -25,13 +25,13 @@ SECRET_KEY = '394^jouyo0hws#%#gzp&$c6$upe!v()-b#ro9nk106)@yhzyg^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*.*.*.*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'market.apps.MarketConfig',
+    # 'market.apps.MarketConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'market',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -51,6 +52,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'MADjangoProject.urls'
 
@@ -77,9 +79,17 @@ WSGI_APPLICATION = 'MADjangoProject.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(os.path.join(os.path.dirname(BASE_DIR), 'db'), 'db.sqlite3'),
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'market',
+            'USER': 'admin',
+            'PASSWORD': '1330871Pp',
+            'HOST': '178.62.38.12',
+            'PORT': '',
     }
 }
 

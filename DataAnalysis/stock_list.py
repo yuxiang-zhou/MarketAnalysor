@@ -1,8 +1,10 @@
 import urllib2
 import threading
 import json
+import time
 from django.utils import timezone
 from bs4 import BeautifulSoup
+from tools import safe_request
 
 # stock list
 def getlist(stock):
@@ -26,23 +28,18 @@ def getLSEList(collection=None):
     FTSE_ALL = 'http://www.londonstockexchange.com/exchange/prices-and-markets/stocks/indices/summary/summary-indices-constituents.html?index=ASX&page={}'
     FTSE_AIM = 'http://www.londonstockexchange.com/exchange/prices-and-markets/stocks/indices/summary/summary-indices-constituents.html?index=AXX&page={}'
 
-    stock = {}
+    ALL_Share = 'http://www.londonstockexchange.com/exchange/prices-and-markets/stocks/prices-search/stock-prices-search.html?nameCode=&page={}'
+
+    stock = []
 
     def get(url):
-        header = {'User-Agent': 'Mozilla/5.0'}
-
         lists = []
         n_pages = 1
         index = 0
 
         while index < n_pages:
             index += 1
-
-            html = urllib2.urlopen(
-                urllib2.Request(
-                    url.format(index),headers=header
-                )
-            )
+            html = safe_request(url.format(index))
             soup = BeautifulSoup(html, 'html.parser')
 
             # get n_pages
@@ -52,6 +49,8 @@ def getLSEList(collection=None):
                         'p'
                     ).string.split('of')[-1].strip()
                 )
+
+            print 'Fetching page {} of {}'.format(index, n_pages)
 
             # parse list
             for tr in soup.find('tbody').find_all('tr'):
@@ -63,7 +62,7 @@ def getLSEList(collection=None):
                 info['name'] = a.string.strip()
                 info['query'] = a.get('href').strip().split(
                     '/'
-                )[-1][:-5]
+                )[-1].split('?')[0][:-5]
 
                 lists.append(info)
 
@@ -71,13 +70,18 @@ def getLSEList(collection=None):
                     obj, created = collection.objects.get_or_create(Symbol=info['symbol'])
                     obj.Query = info['query']
                     obj.Name = info['name']
-                    obj.update_date = timezone.now()
+                    obj.pub_date = timezone.now()
                     obj.save()
 
         return lists
 
-    for url,name in zip([FTSE_ALL, FTSE_AIM],['FTSEALL','FTSEAIM']):
-        stock[name] = get(url)
+    # for url,name in zip([FTSE_ALL, FTSE_AIM],['FTSEALL','FTSEAIM']):
+    #     try:
+    #         stock[name] = get(url)
+    #     except:
+    #         print 'Get list {} failed'.format(name)
+
+    stock = get(FTSE_ALL) + get(FTSE_AIM)
 
     return stock
 

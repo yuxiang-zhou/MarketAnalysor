@@ -5,6 +5,7 @@ import re
 import json
 from django.utils import timezone
 from tools import get_slope
+from tools import safe_request
 
 def get_info(symbol):
     info_query = 'https://www.google.co.uk/finance?q={}'
@@ -49,7 +50,7 @@ def get_info(symbol):
     return info
 
 
-def getLSEInfo(query,collection=None):
+def getLSEInfo(query,symbol,collection=None):
 
     def valid_str(input_str):
         input_str = re.sub('[^0-9a-zA-Z]+', '', input_str)
@@ -67,11 +68,7 @@ def getLSEInfo(query,collection=None):
     info = {}
 
     url = 'http://www.londonstockexchange.com/exchange/prices/stocks/summary/fundamentals.html?fourWayKey={}'
-    html = urllib2.urlopen(
-        urllib2.Request(
-            url.format(query),headers=header
-        )
-    )
+    html = safe_request(url.format(query))
     soup = BeautifulSoup(html, 'html.parser')
     try:
         tIncome,tBalance,tRatio,tCompany,tTrading = soup.find_all('table')
@@ -173,7 +170,7 @@ def getLSEInfo(query,collection=None):
     info['stats'] = stats
 
     if collection:
-        obj, created = collection.objects.get_or_create(Query=query)
+        obj, created = collection.objects.get_or_create(Query=query, Symbol=symbol)
         obj.MarketCap = stats['MarketCap']
         obj.Profit = stats['Profit']
         obj.MPRatio = stats['MPRatio']
@@ -192,6 +189,7 @@ def getLSEInfo(query,collection=None):
         obj.ProfitTrend = get_slope(info['Income']['ProfitBeforeTax'])
         obj.DividendTrend = get_slope(info['Ratio']['DividendYield'])
         obj.DebtTrend = get_slope(info['Balance']['Borrowings'])
+        obj.pub_date = timezone.now()
         obj.save()
 
     return info

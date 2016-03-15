@@ -6,16 +6,22 @@ import json
 import sys
 import os
 import django
+import datetime
+from django.utils import timezone
 
 from stock_list import getlist, getLSEList
 from extract_stock_info import get_info, getLSEInfo
 from extract_stock_history import get_historical_info
+from extract_sector_history import get_sector_history, get_sector_dict, calculate_sector_history
+from extract_stock_news import get_stock_news
+from extract_NT_transactions import get_NT_transactions
 import time
 from pymongo import MongoClient
 import warnings
 import exceptions
-warnings.filterwarnings("ignore", category=exceptions.RuntimeWarning, module='django.db.backends.sqlite3.base', lineno=53)
+import pickle
 
+warnings.filterwarnings("ignore", category=exceptions.RuntimeWarning, module='django.db.backends.sqlite3.base', lineno=53)
 
 if __name__ == '__main__':
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../MADjangoProject'))
@@ -26,46 +32,111 @@ if __name__ == '__main__':
     os.environ['DJANGO_SETTINGS_MODULE'] = 'MADjangoProject.settings'
     django.setup()
 
-    from market.models import Stock, StockHistory
+    from market.models import Stock, StockHistory, SectorHistory, StockNT
+    import argparse
 
-    # Connect MongoDB
-    # host = 'localhost'
-    # port = 27017
-    # if len(sys.argv) > 1:
-    #     host = sys.argv[1]
-    # if len(sys.argv) > 2:
-    #     port = int(sys.argv[2])
-    #
-    # try:
-    #     print 'Try connecting db...'
-    #     client = MongoClient("mongodb://"+host, port)
-    #     print 'Done.'
-    #     db = client.meteor
-    #     stockDB = db.stock
-    #     stockDBHist = db.stockhist
-    # except:
-    #     print "Unexpected error:", sys.exc_info()[0]
-    #     exit()
-    #
-    #
-    #
+    # parse arguments
+
+    parser = argparse.ArgumentParser(description='Stock Fetching')
+    parser.add_argument('-i', dest='stock_info_list', default=False, help='Stock Infomation List', action="store_true")
+    parser.add_argument('-l', dest='stock_history_list', default=False, help='Stock History List', action="store_true")
+    parser.add_argument('-n', dest='stock_news_list', default=False, help='Stock News List', action="store_true")
+    parser.add_argument('-t', dest='NT_list', default=False, help='Naked Trader List', action="store_true")
+    parser.add_argument('-s', dest='sector_history_list', default=False, help='Sector History List', action="store_true")
+    args = parser.parse_args()
+
+    sectors = [s.Sector for s in Stock.objects.distinct('Sector') if s.Sector]
 
     print 'Fethcing Indices...'
-    FTSE = getLSEList(collection=Stock)
-    #
-    # Get Share Info
-    for share in FTSE['FTSEALL']+FTSE['FTSEAIM']:
-        print 'Fetching info of ' + share['name']
-        info = getLSEInfo(share['query'],collection=Stock)
-        symbol = share['symbol']
+
+    dt = timezone.now()
+    fn = '{:04d}{:02d}.pkl'.format(dt.year,dt.month)
+
+    if os.path.isfile(fn):
+        ALL_Stocks = pickle.load(open(fn, "rb"))
+    else:
+        ALL_Stocks = getLSEList(collection=Stock)
+        pickle.dump(ALL_Stocks, open(fn, "wb"))
+
+    def get_share_info():
+        for share in ALL_Stocks:
+            print 'Fetching info of ' + share['name']
+            info = getLSEInfo(share['query'], share['symbol'],collection=Stock)
+
+    def get_share_hist():
+        count = 0
+        for share in ALL_Stocks:
+            print 'Fetching history of ' + share['name']
+            count += 1
+            symbol = share['symbol']
+            hist = get_historical_info(symbol,collection=Stock)
+
+    def calculate_sector_hist():
+        for sector in sectors:
+            print 'Calculating sector {}'.format(sector)
+            hist = calculate_sector_history(
+                sector, collection=StockHistory
+            )
+
+            for h in hist:
+                obj, created = SectorHistory.objects.get_or_create(
+                    Sector=sector, pub_date=h['pub_date']
+                )
+
+                obj.Symbol = sector
+                obj.Open = h['Open']
+                obj.High = h['High']
+                obj.Low = h['Low']
+                obj.Close = h['Close']
+                obj.Volumn = h['Volumn']
+                obj.save()
 
 
-    # Get Share History
-    count = 0
-    for share in FTSE['FTSEALL']+FTSE['FTSEAIM']:
-        print 'Fetching history of ' + share['name']
-        count += 1
-        symbol = share['symbol']
-        hist = get_historical_info(symbol,collection=Stock)
-        # with open('db/{}.csv'.format(symbol),'w') as fi:
-        #     fi.write(json.dumps(hist))
+
+
+    def get_sector_hist():
+        sec_dictionary = {'FTSE':'FTSE', 'FTAI':'FTAI'}
+        for sector in sec_dictionary.keys():
+            print 'Fethcing {} Sector Histories'.format(sector)
+            get_sector_history(
+                sec_dictionary[sector],
+                sector,
+                collection=SectorHistory
+            )
+
+    def get_stock_news_list():
+        for share in ALL_Stocks:
+            print 'Fethcing News of ' + share['name']
+            get_stock_news(share['symbol'], collection=Stock)
+
+    def get_nt():
+        print 'Fethcing NT Suggestions'
+        # StockNT.objects.all().delete()
+        get_NT_transactions(collection=Stock)
+
+    import threading
+    print 'Distributing Jobs ...'
+
+    threads = []
+    callables = []
+    if args.stock_info_list:
+        callables.append(get_share_info)
+    if args.stock_history_list:
+        callables.append(get_share_hist)
+        callables.append(get_sector_hist)
+    if args.stock_news_list:
+        callables.append(get_stock_news_list)
+    if args.NT_list:
+        callables.append(get_nt)
+    if args.sector_history_list:
+        callables.append(calculate_sector_hist)
+
+
+    for f in callables:
+        t = threading.Thread(target=f)
+        t.setDaemon(True)
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()

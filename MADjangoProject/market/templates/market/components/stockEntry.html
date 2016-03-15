@@ -1,5 +1,15 @@
 {% load humanize %}
+{% load stockfilter %}
 <tr class="clickable-row" onclick="location.href='{% url 'market:detail' obj.Symbol %}';">
+  {% if request.user.is_active %}
+  <td align="center">
+    {% if obj.stockselection_set|has_user:request.user %}
+      <i class="fa fa-fw fa-heart c-heart fa-lg"></i>
+    {% else %}
+      <i class="fa fa-fw fa-heart-o c-heart-o fa-lg"></i>
+    {% endif %}
+  </td>
+  {% endif %}
   <td>{{obj.Symbol}}</td>
   <td>{{obj.Name}}</td>
   <td>{{obj.MarketCap}}</td>
@@ -13,4 +23,5 @@
   <td>{{obj.ProfitTrend|floatformat:2}}</td>
   <td>{{obj.DividendTrend|floatformat:2}}</td>
   <td>{{obj.DebtTrend|floatformat:2}}</td>
+  <td>{{obj.Sector}}</td>
 </tr>

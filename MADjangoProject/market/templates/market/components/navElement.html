@@ -1,0 +1,33 @@
+<li>
+  {% if navElem.user_active %}
+    {% if request.user.is_active %}
+      <a href={{navElem.path}} class={{navElem.isActive}}>
+        <i class="fa fa-fw {{navElem.icon}}"></i>{{navElem.label}}
+        {% if navElem.children %}
+          <span class="fa arrow"></span>
+        {% endif %}
+      </a>
+      {% if navElem.children %}
+        <ul class="nav nav-second-level">
+          {% for child in navElem.children %}
+            {% include 'market/components/navElement.html' with navElem=child %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endif %}
+  {% else %}
+    <a href={{navElem.path}} class={{navElem.isActive}}>
+      <i class="fa fa-fw {{navElem.icon}}"></i>{{navElem.label}}
+      {% if navElem.children %}
+        <span class="fa arrow"></span>
+      {% endif %}
+    </a>
+    {% if navElem.children %}
+      <ul class="nav nav-second-level">
+        {% for child in navElem.children %}
+          {% include 'market/components/navElement.html' with navElem=child %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+</li>

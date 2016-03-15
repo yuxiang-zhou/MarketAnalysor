@@ -1,0 +1,25 @@
+{% extends "market/template.html" %}
+{% load staticfiles%}
+{% block scripts %}
+<script type='text/javascript'>
+  $(document).ready(function() {
+    $('table').DataTable({
+      "order": [[ 1, "asc" ]],
+      "iDisplayLength": 50
+    });
+  });
+</script>
+{% endblock %}
+{% block content %}
+<div id="page-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header"> <b>Account</b>: {{request.user.username}}</h1>
+    </div>
+  </div>
+  {% if StockFav %}
+    {% include 'market/components/stocklist.html' with index='Favourite' Stocklist=StockFav %}
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,4 +1,20 @@
 {% extends "market/template.html" %}
+{% block scripts %}
+<script type='text/javascript'>
+  $(document).ready(function() {
+    {% if StockFTSEALL %}
+      $('#stockTableFTSE').DataTable({
+        "order": [[ 1, "asc" ]]
+      });
+    {% endif %}
+    {% if StockFTSEAIMALL %}
+      $('#stockTableFTAI').DataTable({
+        "order": [[ 1, "asc" ]]
+      });
+    {% endif %}
+  });
+</script>
+{% endblock %}
 {% block content %}
 <div id="page-wrapper">
   <div class="row">
@@ -8,14 +24,18 @@
   </div>
   <div class="row">
     <div class="col-lg-12">
-      <input id="stockFilter" type="checkbox" name="stockFilter" checked="undefined"/><span>Apply Basis Filter</span>
+      <form action="" method="post">
+        {% csrf_token %}
+        <input id="stockFilter" type="checkbox" onclick="this.form.submit();" name="stockFilter" {{isFiltered}}/>
+        <span>Apply Basis Filter</span>
+      </form>
     </div>
   </div>
   {% if StockFTSEALL %}
-    {% include 'market/stocklist.html' with index='FTSE All-Share' Stocklist=StockFTSEALL %}
+    {% include 'market/components/stocklist.html' with index='FTSE All-Share' Stocklist=StockFTSEALL name='FTSE' %}
   {% endif %}
   {% if StockFTSEAIMALL %}
-    {% include 'market/stocklist.html' with index='FTSE AIM All-Share' Stocklist=StockFTSEAIMALL %}
+    {% include 'market/components/stocklist.html' with index='FTSE AIM All-Share' Stocklist=StockFTSEAIMALL name='FTAI' %}
   {% endif %}
 </div>
 {% endblock %}

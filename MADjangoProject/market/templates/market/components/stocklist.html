@@ -4,9 +4,12 @@
       <div class="panel-heading"><a name="{{index}}">{{index}}</a></div>
       <div class="panel-body">
         <div class="table-responsive">
-          <table id="stockTable" class="table table-striped table-bordered table-hover">
+          <table id="stockTable{{name}}" class="table table-striped table-bordered table-hover display" cellspacing="0">
             <thead>
               <tr>
+                {% if request.user.is_active %}
+                <th>Marked</th>
+                {% endif %}
                 <th>Symbol</th>
                 <th>Name</th>
                 <th>Market Cap. (£ m)</th>
@@ -20,11 +23,12 @@
                 <th>Profit Trend</th>
                 <th>Divident Trend</th>
                 <th>Debt Trend</th>
+                <th>Sector</th>
               </tr>
             </thead>
             <tbody>
               {% for obj in Stocklist %}
-                {% include 'market/stockEntry.html' with obj=obj %}
+                {% include 'market/components/stockEntry.html' with obj=obj %}
               {% endfor %}
             </tbody>
           </table>

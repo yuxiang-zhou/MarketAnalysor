@@ -1,0 +1,51 @@
+{% extends "market/template.html" %}
+{% load staticfiles%}
+{% block scripts %}
+<script type='text/javascript'>
+  $(document).ready(function() {
+    $('#newsTable').DataTable({
+      "order": [[ 2, "desc" ]],
+      "iDisplayLength": 50
+    });
+  });
+</script>
+
+{% endblock %}
+{% block content %}
+<div id="page-wrapper">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="fa fa-newspaper-o fa-fw"></i>Favourite News
+        </div>
+        <!-- /.panel-heading-->
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table id="newsTable" class="table table-striped table-bordered table-hover display" cellspacing="0">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Title</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for news in AllNews %}
+                <tr class="clickable-row" onclick="window.open('{{news.url}}');">
+                  <td>{{news.stock.Symbol}}</td>
+                  <td>{{news.title}}</td>
+                  <td><small class="pull-right text-muted"><i class="fa fa-clock-o fa-fw"></i>{{news.pub_date|date:'M-d-y H:i'}}</small></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- /.panel-body-->
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

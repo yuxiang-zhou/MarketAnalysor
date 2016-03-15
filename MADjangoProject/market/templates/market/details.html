@@ -1,98 +1,58 @@
 {% extends "market/template.html" %}
-{% load staticfiles%}
+{% load staticfiles %}
+{% load stockfilter %}
+
+
 {% block scripts %}
-<script type="text/javascript">
-  var jqxhr = $.getJSON("{% url 'market:history' stockdetail.Symbol %}", function(data) {
-    var candlestickChart, h, hist_volumn, history, i, len, strDate, volumnChart;
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type='text/javascript'>
+  google.charts.load('current', {'packages':['annotationchart']});
+  google.charts.setOnLoadCallback(drawCharts);
+  function drawCharts() {
 
-    history = [];
-    hist_volumn = [];
+    plot("{% url 'market:history' stockdetail.Symbol %}", 'stockChartContainer', '{{stockdetail.Symbol}}');
 
-    for (i = 0, len = data.length; i < len; i++) {
-      h = data[i]['fields'];
-      strDate = new Date(Date.parse(h.pub_date));
-      history.push({
-        x: strDate,
-        y: [h.Open, h.High, h.Low, h.Close]
-      });
-      hist_volumn.push({
-        x: strDate,
-        y: h.Volumn
-      });
-    }
 
-    candlestickChart = new CanvasJS.Chart("candlestickChartContainer", {
-      title: {
-        text: "Candle Stick Chart: {{stockdetail.Symbol}}"
-      },
-      zoomEnabled: true,
-      backgroundColor: "",
-      axisY: {
-        includeZero: false,
-        title: "Prices",
-        prefix: " ",
-        suffix: " p",
-        labelFontSize: 12,
-        valueFormatString: "0000"
-      },
-      axisX: {
-        interval: 2,
-        labelFontSize: 12,
-        intervalType: "month",
-        valueFormatString: "MMM-YY",
-        labelAngle: -45
-      },
-      data: [
-        {
-          type: "candlestick",
-          risingColor: "#EDCDFF",
-          color: "#9A65AB",
-          dataPoints: history
-        }
-      ]
-    });
-    candlestickChart.render();
-    volumnChart = new CanvasJS.Chart("volumnChartContainer", {
-      zoomEnabled: true,
-      backgroundColor: "",
-      axisY: {
-        includeZero: false,
-        title: "Volumn",
-        labelFontSize: 12,
-        valueFormatString: "00.0E+0"
-      },
-      axisX: {
-        interval: 2,
-        intervalType: "month",
-        valueFormatString: "MMM-YY",
-        labelAngle: -45,
-        labelFontSize: 12
-      },
-      data: [
-        {
-          dataPoints: hist_volumn,
-          color: "#EDCDFF"
-        }
-      ]
-    });
-    volumnChart.render();
-    return console.log(volumnChart);
-  }).fail(function() {
-    return console.log('Faild to retrieve history');
-  });
+    {% if 'AIM' in stockdetail.Catagory %}
+    plot("{% url 'market:historysector' 'FTAI' %}", 'FTAIChartContainer', 'FTAI');
+    {% else %}
+    plot("{% url 'market:historysector' 'FTSE' %}", 'FTSEChartContainer', 'FTSE');
+    {% endif %}
+
+    plot("{% url 'market:historysector' stockdetail.Sector %}", 'sectorChartContainer', '{{stockdetail.Sector}}');
+
+  }
 </script>
 {% endblock %}
+
+
 {% block content %}
 <div id="page-wrapper">
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header"> <b>{{stockdetail.Symbol}}</b>: {{stockdetail.Name}}</h1>
+      <form id="track_toggle" action="" method="post">
+        {% csrf_token %}
+        <h1 class="page-header">
+          <b>{{stockdetail.Symbol}}</b>: {{stockdetail.Name}}
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          {% if request.user.is_active %}
+            <input type="hidden" value="{{request.user.username}}" name="username" />
+            {% if stockdetail.stockselection_set|has_user:request.user %}
+              <i class="fa fa-fw fa-heart fa-lg c-heart clickable" onclick='document.getElementById("track_toggle").submit();'></i>
+              <input type="hidden" value=true name="track" />
+            {% else %}
+              <i class="fa fa-fw fa-heart-o fa-lg c-heart-o clickable" onclick='document.getElementById("track_toggle").submit();'></i>
+              <input type="hidden" value=false name="track" />
+            {% endif %}
+          {% endif %}
+        </h1>
+      </form>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-4"><b>{{stockdetail.Price}}</b></div>
     <div class="col-lg-4"><i>Market Cap.: £{{stockdetail.MarketCap}}(M)</i></div>
-    <div class="col-lg-4"><i>EMS: {{stockdetail..EMS}}</i></div>
+    <div class="col-lg-4"><i>EMS: {{stockdetail.EMS}}</i></div>
   </div>
   <div class="row">
     <div class="col-lg-4"><i>Range: {{stockdetail.Bid}}p (bid) - {{stockdetail.Offer}}p (offer)</i></div>
@@ -106,22 +66,56 @@
   </div>
   <div class="row">
     <div class="col-lg-12">
-      <h3 class="page-header">Chart</h3>
-      <div id="candlestickChartContainer"></div>
-      <div id="volumnChartContainer"></div>
+      <h3 class="page-header">Analysis</h3>
+      <a href="http://www.londonstockexchange.com/ftse-analytics/{{stockdetail.Query}}.pdf">LSE Analysis</a>
     </div>
   </div>
-  <!-- <div class="row">
-    <div class="col-lg-12">
-      <h3 class="page-header">Info</h3>
-      <p>Address: {Company.Companyaddress}</p>
-      <p>IPO: {Company.ListingAdmissiontotrading}</p>
+  <div class="row">
+    <div class="col-lg-4"><i>Profit Trend: {{stockdetail.ProfitTrend|floatformat:2}}</i></div>
+    <div class="col-lg-4"><i>Dividend Trend: {{stockdetail.DividendTrend|floatformat:2}}</i></div>
+    <div class="col-lg-4"><i>Debt Trend: {{stockdetail.DebtTrend}}</i></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><i>Weekly Change: {{stockdetail.weekly_change|floatformat:2}}%</i></div>
+    <div class="col-lg-4"><i>Monthly Change: {{stockdetail.monthly_change|floatformat:2}}%</i></div>
+    <div class="col-lg-4"><i>Seasonally Change: {{stockdetail.seasonally_change|floatformat:2}}%</i></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4"><i>Half Yearly Change: {{stockdetail.halfyearly_change|floatformat:2}}%</i></div>
+    <div class="col-lg-4"><i>Yearly Change: {{stockdetail.yearly_change|floatformat:2}}%</i></div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <h3 class="page-header">Stock: {{stockdetail.Symbol}}</h3>
+      <div id="stockChartContainer" class='candlestickChartContainer loader'></div>
     </div>
-  </div> -->
+    {% if 'AIM' in stockdetail.Catagory %}
+    <div class="col-lg-4">
+      <h3 class="page-header">FTAI</h3>
+      <div id="FTAIChartContainer" class='candlestickChartContainer loader'></div>
+    </div>
+    {% else %}
+    <div class="col-lg-4">
+      <h3 class="page-header">FTSE</h3>
+      <div id="FTSEChartContainer" class='candlestickChartContainer loader'></div>
+    </div>
+    {% endif %}
+
+    <div class="col-lg-4">
+      <h3 class="page-header">Sector: {{stockdetail.Sector}}</h3>
+      <div id="sectorChartContainer" class='candlestickChartContainer loader'></div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-lg-12">
-      <h3 class="page-header">Analysis</h3>
+      <h3 class="page-header">News</h3>
+      <ul>
+        {% for news in stocknews %}
+          <li><a href='{{news.url}}'>{{news.title}}</a> | <span>{{news.pub_date}}</span></li>
+        {% endfor %}
+      </ul>
     </div>
   </div>
+
 </div>
 {% endblock %}

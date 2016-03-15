@@ -7,6 +7,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+db/
 env/
 build/
 develop-eggs/
@@ -58,3 +59,6 @@ target/
 *.txt
 run
 csv/db/
+
+DataAnalysis/data
+*.pkl
