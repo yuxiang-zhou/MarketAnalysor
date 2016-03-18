@@ -125,6 +125,12 @@ def list(request, indices):
     )
 
 
+def sectorlist(request):
+
+    return addCORSHeaders(
+        HttpResponse(sector_names)
+    )
+
 def detail(request, symbol):
 
     context = get_object_or_404(
