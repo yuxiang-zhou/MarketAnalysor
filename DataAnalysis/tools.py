@@ -38,6 +38,9 @@ def safe_request(url):
             )
         except Exception as e:
             print e
+            if e.args[0].errno < 500:
+                break
+            
             print 'Retry in {} mins'.format(retry/60)
             html = ""
             time.sleep(retry)
