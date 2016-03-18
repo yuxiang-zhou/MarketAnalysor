@@ -126,9 +126,10 @@ def list(request, indices):
 
 
 def sectorlist(request):
+    context = Stock.objects.distinct('Sector')
 
     return addCORSHeaders(
-        HttpResponse(json.dumps(sector_names))
+        HttpResponse(serializers.serialize('json', context))
     )
 
 def detail(request, symbol):
