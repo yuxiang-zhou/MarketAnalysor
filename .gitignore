@@ -62,3 +62,6 @@ csv/db/
 
 DataAnalysis/data
 *.pkl
+*/bower_components/
+*/node_modules/
+*/.tmp/

@@ -16,4 +16,6 @@ urlpatterns = [
     # APIs
     url(r'^api/history/sector/(?P<sector>.+)$', views.historysector, name='historysector'),
     url(r'^api/history/stock/(?P<symbol>...+)$', views.history, name='history'),
+    url(r'^api/list/(?P<indices>.*)$', views.list, name='api.list'),
+    url(r'^api/detail/(?P<symbol>.+)$', views.detail, name='api.detail'),
 ]

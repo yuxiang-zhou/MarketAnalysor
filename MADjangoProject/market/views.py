@@ -60,7 +60,7 @@ def navRoutes():
         }]
     }]
 
-
+# helper functions
 def common_filter(objects, mcl=49, mch=4000, mp=20, spread=3, liq=2000, dp=3, trend=True, update_date=None):
     query =  objects.filter(MarketCap__gte=mcl).filter(MarketCap__lte=mch).filter(MPRatio__lte=mp).filter(Spread__lte=spread).filter(Liquidity__gte=liq).filter(DPRatio__lte=dp)
 
@@ -72,20 +72,71 @@ def common_filter(objects, mcl=49, mch=4000, mp=20, spread=3, liq=2000, dp=3, tr
     return query
 
 
+def addCORSHeaders(theHttpResponse):
+    if theHttpResponse and isinstance(theHttpResponse, HttpResponse):
+        theHttpResponse['Access-Control-Allow-Origin'] = '*'
+        theHttpResponse['Access-Control-Max-Age'] = '120'
+        theHttpResponse['Access-Control-Allow-Credentials'] = 'true'
+        theHttpResponse['Access-Control-Allow-Methods'] = 'HEAD, GET, OPTIONS, POST, DELETE'
+        theHttpResponse['Access-Control-Allow-Headers'] = 'origin, content-type, accept, x-requested-with'
+    return theHttpResponse
+
+
+# api views
 def history(request, symbol):
-    return HttpResponse(serializers.serialize('json', Stock.objects.get(Symbol=symbol).stockhistory_set.all()))
+    return addCORSHeaders(HttpResponse(
+        serializers.serialize(
+            'json', Stock.objects.get(
+                Symbol=symbol
+            ).stockhistory_set.all().order_by('-pub_date')[:550]
+        )
+    ))
 
 
 def historysector(request, sector):
-    return HttpResponse(
+    return addCORSHeaders(HttpResponse(
         serializers.serialize(
             'json', SectorHistory.objects.filter(
                 Sector__contains=sector.replace('&amp;','&')
-            )
+            ).order_by('-pub_date')[:550]
         )
+    ))
+
+
+def list(request, indices):
+
+    dt = timezone.now()
+    past = dt + datetime.timedelta(days=-2)
+
+    if indices == 'ftse':
+        indices = 'FTSE All-Share'
+    elif indices == 'ftai':
+        indices = 'FTSE AIM All-Share'
+    else:
+        indices = ''
+
+    context = common_filter(
+        Stock.objects.filter(Catagory__contains=indices),
+        update_date=past
+    )
+
+    return addCORSHeaders(
+        HttpResponse(serializers.serialize('json', context))
     )
 
 
+def detail(request, symbol):
+
+    context = get_object_or_404(
+        Stock.objects, Symbol=symbol.upper()
+    )
+
+    return addCORSHeaders(
+        HttpResponse(serializers.serialize('json', [context]))
+    )
+
+
+# client views
 class PostHandlerView(generic.TemplateView):
     def post(self, request, *args, **kwargs):
         kwargs['post'] = self.request.POST
