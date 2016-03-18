@@ -40,4 +40,14 @@ angular.module('servData', []).factory(
       });
     }
   }]
+).factory(
+  'getSectorList', ['$http',
+  function($http) {
+    return function(onSuccess){
+      var query = host + 'api/sector/list';
+      $http.get(query).success(function(data){
+        onSuccess(data);
+      });
+    }
+  }]
 );

@@ -21,6 +21,8 @@ angular
       events:true,
     });
 
+    $urlRouterProvider.when('', '/dashboard/home');
+    $urlRouterProvider.when('/index', '/dashboard/home');
     $urlRouterProvider.otherwise('/dashboard/notfound');
 
     $stateProvider
@@ -145,6 +147,18 @@ angular
             $ocLazyLoad.load({
                 name:'sbAdminApp',
                 files:['scripts/controllers/chartContoller.js']
+            })
+          }
+        }
+      }).state('dashboard.sectors',{
+        templateUrl:'views/sector.html',
+        url:'/sectors',
+        controller:'SectorCtrl',
+        resolve: {
+          loadMyFile:function($ocLazyLoad) {
+            return $ocLazyLoad.load({
+                name:'sbAdminApp',
+                files:['scripts/controllers/sectorContoller.js']
             })
           }
         }
