@@ -128,7 +128,7 @@ def list(request, indices):
 def sectorlist(request):
 
     return addCORSHeaders(
-        HttpResponse(sector_names)
+        HttpResponse(serializers.serialize('json', sector_names))
     )
 
 def detail(request, symbol):
