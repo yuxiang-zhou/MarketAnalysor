@@ -74,12 +74,11 @@ def common_filter(objects, mcl=49, mch=4000, mp=20, spread=3, liq=2000, dp=3, tr
 
 
 def addCORSHeaders(theHttpResponse):
-    if theHttpResponse and isinstance(theHttpResponse, HttpResponse):
-        theHttpResponse['Access-Control-Allow-Origin'] = '*'
-        theHttpResponse['Access-Control-Max-Age'] = '120'
-        theHttpResponse['Access-Control-Allow-Credentials'] = 'true'
-        theHttpResponse['Access-Control-Allow-Methods'] = 'HEAD, GET, OPTIONS, POST, DELETE'
-        theHttpResponse['Access-Control-Allow-Headers'] = 'origin, content-type, accept, x-requested-with'
+    theHttpResponse['Access-Control-Allow-Origin'] = '*'
+    theHttpResponse['Access-Control-Max-Age'] = '120'
+    theHttpResponse['Access-Control-Allow-Credentials'] = 'true'
+    theHttpResponse['Access-Control-Allow-Methods'] = 'HEAD, GET, OPTIONS, POST, DELETE'
+    theHttpResponse['Access-Control-Allow-Headers'] = 'origin, content-type, accept, x-requested-with'
     return theHttpResponse
 
 
