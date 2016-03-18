@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login
 
 import datetime
 import urllib
+import json
 
 from .models import Stock, StockHistory, StockSelection, SectorHistory, StockNews, StockNT
 from django.contrib.auth.models import User
@@ -128,7 +129,7 @@ def list(request, indices):
 def sectorlist(request):
 
     return addCORSHeaders(
-        HttpResponse(serializers.serialize('json', sector_names))
+        HttpResponse(json.dumps(sector_names))
     )
 
 def detail(request, symbol):
