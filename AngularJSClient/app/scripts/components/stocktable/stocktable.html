@@ -1,6 +1,7 @@
 <table class="table table-striped table-bordered table-hover" id="dataTables-example">
   <thead>
     <tr>
+      <th>Like</th>
       <th>Symbol</th>
       <th>Name</th>
       <th>Market Cap. (£ m)</th>
@@ -19,6 +20,7 @@
   </thead>
   <tbody>
     <tr class='clickable-row' ng-repeat="obj in ftse" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}" ui-sref="dashboard.detail({symbol: obj.fields.Symbol})">
+      <td><fav symbol='obj.fields.Symbol'></fav></td>
       <td>{{obj.fields.Symbol}}</td>
       <td>{{obj.fields.Name}}</td>
       <td>{{obj.fields.MarketCap}}</td>

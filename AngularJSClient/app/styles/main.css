@@ -1,6 +1,7 @@
 /* Space out content a bit */
 body {
     padding-bottom: 20px;
+    padding-top: 50px;
 }
 tr.clickable-row {
   cursor: pointer;
@@ -81,6 +82,6 @@ tr.clickable-row {
 }
 
 .nav>li.active>a {
-text-decoration: none;
-background-color: #eee;
+  text-decoration: none;
+  background-color: #eee;
 }

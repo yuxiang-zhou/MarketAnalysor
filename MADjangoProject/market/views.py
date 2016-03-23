@@ -78,7 +78,7 @@ def addCORSHeaders(theHttpResponse):
     theHttpResponse['Access-Control-Max-Age'] = '120'
     theHttpResponse['Access-Control-Allow-Credentials'] = 'true'
     theHttpResponse['Access-Control-Allow-Methods'] = 'HEAD, GET, OPTIONS, POST, DELETE'
-    theHttpResponse['Access-Control-Allow-Headers'] = 'origin, content-type, accept, x-requested-with'
+    theHttpResponse['Access-Control-Allow-Headers'] = 'origin, content-type, accept, x-requested-with, Authorization'
     return theHttpResponse
 
 
@@ -125,12 +125,43 @@ def list(request, indices):
     )
 
 
-def sectorlist(request):
-    context = Stock.objects.distinct('Sector')
+def news(request, symbol):
+
+    dt = timezone.now()
+    past = dt + datetime.timedelta(days=-2)
+
+    def parseNews(data):
+        return [
+            {
+                'title': news.title,
+                'symbol': news.stock.Symbol,
+                'pub_date': news.pub_date.strftime("%d-%b-%Y %H:%M"),
+                'url': news.url
+            } for news in data
+        ]
+
+    if(symbol == 'all'):
+        context = parseNews(StockNews.objects.filter(
+                pub_date__gte=past
+            ).order_by('-pub_date')[:800]
+        )
+    else:
+        context = parseNews(StockNews.objects.filter(
+                pub_date__gte=past, stock__Symbol=symbol
+            ).order_by('-pub_date')
+        )
 
     return addCORSHeaders(
-        HttpResponse(serializers.serialize('json', context))
+        HttpResponse(json.dumps(context))
     )
+
+
+def sectorlist(request):
+
+    return addCORSHeaders(
+        HttpResponse(json.dumps(sector_names))
+    )
+
 
 def detail(request, symbol):
 
@@ -142,6 +173,103 @@ def detail(request, symbol):
         HttpResponse(serializers.serialize('json', [context]))
     )
 
+
+def favlist(request, username):
+
+    context = [sel.stock for sel in StockSelection.objects.filter(user__username=username)]
+
+    return addCORSHeaders(
+        HttpResponse(serializers.serialize('json', context))
+    )
+
+def favnews(request, username):
+
+    favstocks = [
+        sel.stock for sel in StockSelection.objects.filter(
+            user__username=username
+        )
+    ]
+
+    context = []
+    dt = timezone.now()
+    past = dt + datetime.timedelta(days=-2)
+    for stock in favstocks:
+        context += [
+            {
+                'title': news.title,
+                'symbol': news.stock.Symbol,
+                'pub_date': news.pub_date.strftime("%d-%b-%Y %H:%M"),
+                'url': news.url
+            } for news in StockNews.objects.filter(stock=stock, pub_date__gte=past).order_by('-pub_date')
+        ]
+
+    return addCORSHeaders(
+        HttpResponse(json.dumps(context))
+    )
+
+def favlike(request, username, symbol):
+
+    user = User.objects.get(username=username)
+    stock = Stock.objects.get(Symbol=symbol)
+    selection = StockSelection(user=user, stock=stock)
+    selection.save()
+
+    return addCORSHeaders(
+        HttpResponse(json.dumps({"success":True}))
+    )
+
+def favdislike(request, username, symbol):
+
+    StockSelection.objects.filter(user__username=username, stock__Symbol=symbol).delete()
+
+    return addCORSHeaders(
+        HttpResponse(json.dumps({"success":True}))
+    )
+
+def isfav(request, username, symbol):
+
+    result = StockSelection.objects.filter(user__username=username, stock__Symbol=symbol).exists()
+
+    return addCORSHeaders(
+        HttpResponse(json.dumps({"success":True, "result":result}))
+    )
+
+
+def nakedtrader(request):
+
+    context = [{
+        "symbol": nt.stock.Symbol,
+        "qty": nt.qty,
+        "price": nt.price,
+        "target": nt.target,
+        "stop": nt.stop,
+        "buy_date": nt.buy_date.strftime("%d-%b-%Y"),
+        "sell": nt.sell,
+        "sell_date": nt.sell_date.strftime("%d-%b-%Y"),
+        "pl": nt.pl,
+    } for nt in StockNT.objects.all().order_by('-buy_date')[:100]]
+
+    return addCORSHeaders(
+        HttpResponse(json.dumps(context))
+    )
+
+
+def loginRequest(request, username, password):
+    user = authenticate(username=username, password=password)
+    response = {'success':False}
+    if user:
+        # the password verified for the user
+        if user.is_active:
+            response['success'] = True
+        else:
+            response['message'] = "The password is valid, but the account has been disabled!"
+    else:
+        # the authentication system was unable to verify the username and password
+        response['message'] = "The username and password were incorrect."
+
+    return addCORSHeaders(
+        HttpResponse(json.dumps(response))
+    )
 
 # client views
 class PostHandlerView(generic.TemplateView):

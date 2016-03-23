@@ -1,6 +1,8 @@
 angular.module('sbAdminApp').directive('annochart', function() {
   return {
     templateUrl: 'scripts/components/annotativechart/annochart.html',
+    replace: true,
+    restrict: 'E',
     scope: {
       url: '=',
       plotid: '@',

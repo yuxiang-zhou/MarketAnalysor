@@ -36,14 +36,15 @@ def safe_request(url):
                     url, headers=header
                 )
             )
-        except Exception as e:
-            print e
-            if e.args[0].errno < 500:
+        except urllib2.HTTPError as e:
+            if e.fp.getcode() < 500:
                 break
-            
+
             print 'Retry in {} mins'.format(retry/60)
             html = ""
             time.sleep(retry)
             retry *= 2
+        except:
+            break
 
     return html

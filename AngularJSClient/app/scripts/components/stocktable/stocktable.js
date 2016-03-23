@@ -4,6 +4,7 @@ angular.module('sbAdminApp').directive('stocktable', function(){
     scope: {
       ftse: '='
     },
-    restrict: 'E'
+    restrict: 'E',
+    replace: true
   }
 });

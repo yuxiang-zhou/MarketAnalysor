@@ -1,50 +1,98 @@
-var host = 'http://localhost:8001/';
-
 angular.module('servData', []).factory(
-  'getList', ['$http',
-  function($http) {
+  'getList', ['$http', '$rootScope',
+  function($http, $rootScope) {
     return function(indices, onSuccess){
-      var query = host + 'api/list/' + indices;
+      var query = $rootScope.host + 'api/list/' + indices;
       $http.get(query).success(function(data){
         onSuccess(data);
       });
     }
   }]
 ).factory(
-  'getHistoryStock', ['$http',
-  function($http) {
+  'getHistoryStock', ['$http', '$rootScope',
+  function($http, $rootScope) {
     return function(symbol, onSuccess){
-      var query = host + 'api/history/stock/' + symbol;
+      var query = $rootScope.host + 'api/history/stock/' + symbol;
       $http.get(query).success(function(data){
         onSuccess(data);
       });
     }
   }]
 ).factory(
-  'getHistorySector', ['$http',
-  function($http) {
+  'getHistorySector', ['$http', '$rootScope',
+  function($http, $rootScope) {
     return function(sector, onSuccess){
-      var query = host + 'api/history/sector/' + sector;
+      var query = $rootScope.host + 'api/history/sector/' + sector;
       $http.get(query).success(function(data){
         onSuccess(data);
       });
     }
   }]
 ).factory(
-  'getDetail', ['$http',
-  function($http) {
+  'getDetail', ['$http', '$rootScope',
+  function($http, $rootScope) {
     return function(symbol, onSuccess){
-      var query = host + 'api/detail/' + symbol;
+      var query = $rootScope.host + 'api/detail/' + symbol;
       $http.get(query).success(function(data){
         onSuccess(data);
       });
     }
   }]
 ).factory(
-  'getSectorList', ['$http',
-  function($http) {
+  'getSectorList', ['$http', '$rootScope',
+  function($http, $rootScope) {
     return function(onSuccess){
-      var query = host + 'api/sector/list';
+      var query = $rootScope.host + 'api/sector/list/';
+      $http.get(query).success(function(data){
+        onSuccess(data);
+      });
+    }
+  }]
+).factory(
+  'getNews', ['$http', '$rootScope',
+  function($http, $rootScope) {
+    return function(userid, onSuccess){
+      var query = $rootScope.host + 'api/news/' + userid;
+      $http.get(query).success(function(data){
+        onSuccess(data);
+      });
+    }
+  }]
+).factory(
+  'getFavList', ['$http', '$rootScope',
+  function($http, $rootScope) {
+    return function(userid, onSuccess){
+      var query = $rootScope.host + 'api/favlist/' + userid;
+      $http.get(query).success(function(data){
+        onSuccess(data);
+      });
+    }
+  }]
+).factory(
+  'getFavNews', ['$http', '$rootScope',
+  function($http, $rootScope) {
+    return function(userid, onSuccess){
+      var query = $rootScope.host + 'api/favnews/' + userid;
+      $http.get(query).success(function(data){
+        onSuccess(data);
+      });
+    }
+  }]
+).factory(
+  'getNT', ['$http', '$rootScope',
+  function($http, $rootScope) {
+    return function(onSuccess){
+      var query = $rootScope.host + 'api/nt/';
+      $http.get(query).success(function(data){
+        onSuccess(data);
+      });
+    }
+  }]
+).factory(
+  'isFave', ['$http', '$rootScope',
+  function($http, $rootScope) {
+    return function(username, symbol, onSuccess){
+      var query = $rootScope.host + 'api/isfav/' + username + '/' + symbol;
       $http.get(query).success(function(data){
         onSuccess(data);
       });
