@@ -211,8 +211,9 @@ def favlike(request, username, symbol):
 
     user = User.objects.get(username=username)
     stock = Stock.objects.get(Symbol=symbol)
-    selection = StockSelection(user=user, stock=stock)
-    selection.save()
+    if(not StockSelection.objects.filter(user__username=username, stock__Symbol=symbol).exists()):
+        selection = StockSelection(user=user, stock=stock)
+        selection.save()
 
     return addCORSHeaders(
         HttpResponse(json.dumps({"success":True}))
