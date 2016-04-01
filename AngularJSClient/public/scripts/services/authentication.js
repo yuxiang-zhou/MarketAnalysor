@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('Authentication', []).factory('AuthenticationService',
-  ['Base64', '$http', '$cookieStore', '$rootScope', '$timeout',
-  function (Base64, $http, $cookieStore, $rootScope, $timeout) {
+  ['Base64', '$http', '$cookieStore', '$cookies', '$rootScope',
+  function (Base64, $http, $cookieStore, $cookies, $rootScope) {
     var service = {};
 
     service.Login = function (username, password, callback) {
@@ -25,14 +25,24 @@ angular.module('Authentication', []).factory('AuthenticationService',
           }
         };
 
+        var expire_date = new Date();
+        expire_date.setSeconds(expire_date.getSeconds() + 600);
+
         $http.defaults.headers.common['Authorization'] = 'Basic ' + authdata; // jshint ignore:line
         $cookieStore.put('globals', $rootScope.globals);
+        $cookies.put('timeout','timeout', {
+          expires: expire_date
+        });
     };
 
     service.ClearCredentials = function () {
         $rootScope.globals = {};
         $cookieStore.remove('globals');
         $http.defaults.headers.common.Authorization = 'Basic ';
+    };
+
+    service.isAuthenticated = function () {
+        return $rootScope.globals && $cookieStore.get('globals') && $cookies.get('timeout');
     };
 
     return service;

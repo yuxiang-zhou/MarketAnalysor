@@ -226,8 +226,8 @@ var app = angular
       })
   }])
 
-.run(['$rootScope', '$location', '$cookieStore', '$http', '$state', '$stateParams',
-  function ($rootScope, $location, $cookieStore, $http, $state, $stateParams) {
+.run(['$rootScope', '$location', '$cookieStore', '$http', '$state', '$stateParams', 'AuthenticationService',
+  function ($rootScope, $location, $cookieStore, $http, $state, $stateParams, AuthenticationService) {
     $rootScope.host = '/';
     // keep user logged in after page refresh
     $rootScope.globals = $cookieStore.get('globals') || {};
@@ -235,6 +235,8 @@ var app = angular
     if ($rootScope.globals.currentUser) {
       $http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata; // jshint ignore:line
     }
+
+    console.log($rootScope.globals);
 
     $rootScope.$on('$locationChangeStart', function (event, next, current) {
       var navStack = [];
@@ -250,7 +252,7 @@ var app = angular
       $rootScope.navigator = navStack;
 
       // redirect to login page if not logged in
-      if ($location.path() !== '/login' && !$rootScope.globals.currentUser) {
+      if ($location.path() !== '/login' && !AuthenticationService.isAuthenticated()) {
           $location.path('login');
       }
     });

@@ -31,6 +31,7 @@ function($scope, $rootScope, getList, getFavNews, getNT) {
     $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
     $scope.predicate = predicate;
   };
+  
   getFavNews($rootScope.globals.currentUser.username, function(data){
     $scope.newslist = data;
   });
