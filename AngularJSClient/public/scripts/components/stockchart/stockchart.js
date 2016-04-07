@@ -1,4 +1,4 @@
-angular.module('sbAdminApp').directive('stockchart', function() {
+angular.module('marketApp').directive('stockchart', function() {
   return {
     templateUrl: 'scripts/components/stockchart/stockchart.html',
     replace: true,
@@ -6,9 +6,10 @@ angular.module('sbAdminApp').directive('stockchart', function() {
     scope: {
       url: '=',
       plotid: '@',
-      title: '@'
+      title: '@',
+      annotation: '='
     },
-    link: function($scope, elem, attrs){
+    link: function($scope, elem, attrs) {
 
       // chart plot def
       function plot(seriesOptions, axesOptions) {
@@ -19,16 +20,18 @@ angular.module('sbAdminApp').directive('stockchart', function() {
           },
 
           tooltip: {
-            pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
-            valueDecimals: 2
+            valueDecimals: 2,
+            shared : true
           },
 
           yAxis: axesOptions,
+          xAxis: {
+            tickPixelInterval: 1
+          },
           series: seriesOptions
         });
       }
 
-      console.log('Loading Chat Data');
       var jqxhr = $.getJSON($scope.url, function(data) {
         var i, j, len;
 
@@ -99,15 +102,47 @@ angular.module('sbAdminApp').directive('stockchart', function() {
             shadow : true,
             type: lastentry ? 'column' : '',
             yAxis: lastentry ? 2 : 0,
+            id: index == 0 ? 'dataseries' : undefined
           });
         });
 
+        // news label settings
+        if($scope.annotation) {
+          var newslistasc = [];
+          $scope.annotation.reverse();
+          $.each($scope.annotation, function(ni, news){
+            newslistasc.push({
+              x : new Date(news.pub_date).getTime(),
+              title : news.title[0],
+              text : news.title,
+              events: {
+                click: function(){window.location.href = news.url;},
+              },
+            });
+          });
+          $scope.annotation.reverse();
+
+          seriesOptions.push({
+            name: 'news',
+            type : 'flags',
+            shadow : true,
+            yAxis: 0,
+            data : newslistasc,
+            onSeries : 'dataseries',
+            shape : 'circlepin',
+            width : 16
+          });
+
+        }
+
+        // axis settings
         axesOptions = [{
           title: {
             text: $scope.title
           },
           height: '70%',
-          lineWidth: 1
+          lineWidth: 1,
+          tickPixelInterval: 1
         }, {
           opposite: false,
           title: {
@@ -115,7 +150,7 @@ angular.module('sbAdminApp').directive('stockchart', function() {
           },
           labels: {
             align: 'right',
-            x: 35,
+            x: 30,
             formatter:function(){
               var max=this.axis.linkedParent.dataMax,
                 min=this.axis.linkedParent.dataMin,
@@ -125,7 +160,8 @@ angular.module('sbAdminApp').directive('stockchart', function() {
           },
           height: '70%',
           linkedTo:0,
-          lineWidth: 1
+          lineWidth: 1,
+          tickPixelInterval: 1
         }, {
           title: {
             text: 'Volume'
@@ -133,9 +169,17 @@ angular.module('sbAdminApp').directive('stockchart', function() {
           top: '75%',
           height: '25%',
           offset: 0,
-          lineWidth: 1
+          lineWidth: 1,
+          tickPixelInterval: 1
+        },{
+          top: '75%',
+          height: '25%',
+          offset: 0,
+          lineWidth: 1,
+          opposite: false
         }];
 
+        elem.removeClass('loader');
         plot(seriesOptions, axesOptions);
       });
 

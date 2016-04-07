@@ -1,12 +1,12 @@
 'use strict';
 /**
  * @ngdoc function
- * @name sbAdminApp.controller:MainCtrl
+ * @name marketApp.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the sbAdminApp
+ * Controller of the marketApp
  */
-angular.module('sbAdminApp')
+angular.module('marketApp')
 .controller('MainCtrl', ['$scope', '$rootScope', 'getList', 'getFavNews', 'getNT',
 function($scope, $rootScope, getList, getFavNews, getNT) {
   $scope.ftse_url = $rootScope.host + 'api/history/sector/FTSE';
@@ -28,10 +28,10 @@ function($scope, $rootScope, getList, getFavNews, getNT) {
 
 
   $scope.order = function(predicate) {
-    $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : false;
+    $scope.reverse = ($scope.predicate === predicate) ? !$scope.reverse : true;
     $scope.predicate = predicate;
   };
-  
+
   getFavNews($rootScope.globals.currentUser.username, function(data){
     $scope.newslist = data;
   });

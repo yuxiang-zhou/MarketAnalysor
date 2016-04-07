@@ -1,4 +1,4 @@
-angular.module('sbAdminApp').directive('fav', ['$rootScope', 'isFav', 'addFav', 'removeFav',function($rootScope, isFav, addFav, removeFav) {
+angular.module('marketApp').directive('fav', ['$rootScope', 'isFav', 'addFav', 'removeFav',function($rootScope, isFav, addFav, removeFav) {
   return {
     templateUrl: 'scripts/components/favIndicator/favIndicator.html',
     replace: true,

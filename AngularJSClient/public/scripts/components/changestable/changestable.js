@@ -1,4 +1,4 @@
-angular.module('sbAdminApp').directive('changestable', function(){
+angular.module('marketApp').directive('changestable', function(){
   return {
     templateUrl: 'scripts/components/changestable/changestable.html',
     scope: {

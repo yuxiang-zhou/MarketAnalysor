@@ -50,13 +50,22 @@ if __name__ == '__main__':
     print 'Fethcing Indices...'
 
     dt = timezone.now()
-    fn = '{:04d}{:02d}.pkl'.format(dt.year,dt.month)
+    fn = '{:04d}{:02d}{:02d}.pkl'.format(dt.year,dt.month,dt.day)
 
     if os.path.isfile(fn):
         ALL_Stocks = pickle.load(open(fn, "rb"))
     else:
         ALL_Stocks = getLSEList(collection=Stock)
         pickle.dump(ALL_Stocks, open(fn, "wb"))
+
+    symbols = [s['symbol'] for s in ALL_Stocks]
+    for s in Stock.objects.all():
+        if not s.Symbol in symbols:
+            ALL_Stocks.append({
+                "symbol": s.Symbol,
+                "name": s.Name,
+                "query": s.Query,
+            })
 
     def get_share_info():
         for share in ALL_Stocks:
@@ -83,13 +92,14 @@ if __name__ == '__main__':
                     Sector=sector, pub_date=h['pub_date']
                 )
 
-                obj.Symbol = sector
-                obj.Open = h['Open']
-                obj.High = h['High']
-                obj.Low = h['Low']
-                obj.Close = h['Close']
-                obj.Volumn = h['Volumn']
-                obj.save()
+                if created:
+                    obj.Symbol = sector
+                    obj.Open = h['Open']
+                    obj.High = h['High']
+                    obj.Low = h['Low']
+                    obj.Close = h['Close']
+                    obj.Volumn = h['Volumn']
+                    obj.save()
 
 
 
@@ -107,7 +117,7 @@ if __name__ == '__main__':
     def get_stock_news_list():
         for share in ALL_Stocks:
             print 'Fethcing News of ' + share['name']
-            get_stock_news(share['symbol'], collection=Stock)
+            get_stock_news(share['symbol'], share['query'], collection=Stock)
 
     def get_nt():
         print 'Fethcing NT Suggestions'

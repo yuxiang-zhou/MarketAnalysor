@@ -13,6 +13,7 @@ import json
 
 from .models import Stock, StockHistory, StockSelection, SectorHistory, StockNews, StockNT
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 sector_names = [s.Sector for s in Stock.objects.distinct('Sector') if s.Sector]
 
@@ -103,6 +104,17 @@ def historysector(request, sector):
     ))
 
 
+def search(request, query):
+    query = query.upper()
+    context = Stock.objects.filter(
+        Q(Symbol__contains=query) | Q(Name__contains=query)
+    )
+
+    return addCORSHeaders(
+        HttpResponse(serializers.serialize('json', context))
+    )
+
+
 def list(request, indices):
 
     dt = timezone.now()
@@ -128,7 +140,8 @@ def list(request, indices):
 def news(request, symbol):
 
     dt = timezone.now()
-    past = dt + datetime.timedelta(days=-2)
+    recent = dt + datetime.timedelta(days=-2)
+    past = dt + datetime.timedelta(days=-365)
 
     def parseNews(data):
         return [
@@ -142,7 +155,7 @@ def news(request, symbol):
 
     if(symbol == 'all'):
         context = parseNews(StockNews.objects.filter(
-                pub_date__gte=past
+                pub_date__gte=recent
             ).order_by('-pub_date')[:800]
         )
     else:
@@ -182,6 +195,7 @@ def favlist(request, username):
         HttpResponse(serializers.serialize('json', context))
     )
 
+
 def favnews(request, username):
 
     favstocks = [
@@ -192,7 +206,7 @@ def favnews(request, username):
 
     context = []
     dt = timezone.now()
-    past = dt + datetime.timedelta(days=-2)
+    past = dt + datetime.timedelta(days=-3)
     for stock in favstocks:
         context += [
             {

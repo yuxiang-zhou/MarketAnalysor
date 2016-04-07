@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^api/favdislike/(?P<username>.+)/(?P<symbol>.+)$', views.favdislike, name='api.favdislike'),
     url(r'^api/isfav/(?P<username>.+)/(?P<symbol>.+)$', views.isfav, name='api.isfav'),
     url(r'^api/nt/$', views.nakedtrader, name='api.nakedtrader'),
+    url(r'^api/search/(?P<query>.+)$', views.search, name='api.search'),
 
 ]

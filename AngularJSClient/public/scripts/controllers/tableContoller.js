@@ -1,13 +1,13 @@
 'use strict';
 /**
  * @ngdoc function
- * @name sbAdminApp.controller:MainCtrl
+ * @name marketApp.controller:MainCtrl
  * @description
  * # MainCtrl
- * Controller of the sbAdminApp
+ * Controller of the marketApp
  */
 
-angular.module('sbAdminApp').controller(
+angular.module('marketApp').controller(
   'TableCtrl',
   [
     '$scope', '$http', '$timeout', '$state', 'getList',

@@ -7,11 +7,16 @@ angular.module('Authentication', []).factory('AuthenticationService',
 
     service.Login = function (username, password, callback) {
 
-        /* Use this for real authentication
-         ----------------------------------------------*/
-        $http.get($rootScope.host + 'api/login/' + username + '/' + password).success(function (response) {
+      /* Use this for real authentication
+       ----------------------------------------------*/
+      $http.get($rootScope.host + 'api/login/' + username + '/' + password).then(
+        function (response) {
           callback(response);
-        });
+        },function(response){
+          response.data = {success:false, message:'Error'};
+          callback(response);
+        }
+      );
 
     };
 
@@ -38,7 +43,7 @@ angular.module('Authentication', []).factory('AuthenticationService',
     service.ClearCredentials = function () {
         $rootScope.globals = {};
         $cookieStore.remove('globals');
-        $http.defaults.headers.common.Authorization = 'Basic ';
+        $http.defaults.headers.common.Authorization = 'Basic';
     };
 
     service.isAuthenticated = function () {

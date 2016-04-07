@@ -1,22 +1,22 @@
 'use strict';
 /**
  * @ngdoc overview
- * @name sbAdminApp
+ * @name marketApp
  * @description
- * # sbAdminApp
+ * # marketApp
  *
  * Main module of the application.
  */
 var app = angular
-  .module('sbAdminApp', [
+  .module('marketApp', [
     'oc.lazyLoad',
     'ui.router',
-    // 'ngAnimate',
     'ui.bootstrap',
     'angular-loading-bar',
     'Authentication',
     'servData',
-    'ngCookies'
+    'ngCookies',
+    'ngAnimate',
   ])
   .config([ '$stateProvider','$urlRouterProvider','$ocLazyLoadProvider',function ($stateProvider,$urlRouterProvider,$ocLazyLoadProvider) {
 
@@ -39,7 +39,7 @@ var app = angular
         resolve: {
           loadMyFile:function($ocLazyLoad) {
             return $ocLazyLoad.load({
-                name:'sbAdminApp',
+                name:'marketApp',
                 files:['scripts/controllers/authenContoller.js']
             })
           }
@@ -52,7 +52,7 @@ var app = angular
             loadMyDirectives:function($ocLazyLoad){
                 return $ocLazyLoad.load(
                 {
-                    name:'sbAdminApp',
+                    name:'marketApp',
                     files:[
                     'scripts/directives/header/header.js',
                     'scripts/directives/header/header-notification/header-notification.js',
@@ -62,36 +62,41 @@ var app = angular
                 }),
                 $ocLazyLoad.load(
                 {
-                   name:'toggle-switch',
-                   files:["bower_components/angular-toggle-switch/angular-toggle-switch.min.js",
-                          "bower_components/angular-toggle-switch/angular-toggle-switch.css"
-                      ]
-                }),
-                $ocLazyLoad.load(
-                {
-                   name:'ngAnimate',
-                   files:["bower_components/angular-animate/angular-animate.js"]
-                }),
-                $ocLazyLoad.load(
-                {
-                  name:'sbAdminApp',
+                  name:'marketApp',
                   files:['scripts/components/stocktable/stocktable.js']
                 }),
                 $ocLazyLoad.load(
                 {
-                  name:'sbAdminApp',
-                  files:['scripts/components/annotativechart/annochart.js']
+                  name:'marketApp',
+                  files:['scripts/components/newstable/newstable.js']
                 }),
                 $ocLazyLoad.load(
                 {
-                  name:'sbAdminApp',
+                  name:'marketApp',
                   files:['scripts/components/stockchart/stockchart.js']
                 }),
                 $ocLazyLoad.load(
                 {
-                  name:'sbAdminApp',
+                  name:'marketApp',
                   files:['scripts/components/favIndicator/favIndicator.js']
                 })
+                // $ocLazyLoad.load(
+                // {
+                //    name:'ngAnimate',
+                //    files:["bower_components/angular-animate/angular-animate.js"]
+                // }),
+                // $ocLazyLoad.load(
+                // {
+                //    name:'toggle-switch',
+                //    files:["bower_components/angular-toggle-switch/angular-toggle-switch.min.js",
+                //           "bower_components/angular-toggle-switch/angular-toggle-switch.css"
+                //       ]
+                // }),
+                // $ocLazyLoad.load(
+                // {
+                //   name:'marketApp',
+                //   files:['scripts/components/annotativechart/annochart.js']
+                // }),
                 // $ocLazyLoad.load(
                 // {
                 //   name:'ngResource',
@@ -116,7 +121,7 @@ var app = angular
         resolve: {
           loadMyFiles:function($ocLazyLoad) {
             return $ocLazyLoad.load({
-              name:'sbAdminApp',
+              name:'marketApp',
               files:[
                 'scripts/controllers/dashboardController.js',
               ]
@@ -130,7 +135,7 @@ var app = angular
         resolve: {
           loadCtrl:function($ocLazyLoad) {
             return $ocLazyLoad.load({
-                name:'sbAdminApp',
+                name:'marketApp',
                 files:['scripts/controllers/tableContoller.js']
             })
           }
@@ -160,8 +165,20 @@ var app = angular
         resolve: {
           loadCtrl:function($ocLazyLoad) {
             return $ocLazyLoad.load({
-                name:'sbAdminApp',
+                name:'marketApp',
                 files:['scripts/controllers/detailContoller.js']
+            })
+          }
+        }
+      }).state('dashboard.search',{
+        templateUrl:'views/search.html',
+        url:'/search/:searchText',
+        controller:'SearchCtrl',
+        resolve: {
+          loadCtrl:function($ocLazyLoad) {
+            return $ocLazyLoad.load({
+                name:'marketApp',
+                files:['scripts/controllers/searchContoller.js']
             })
           }
         }
@@ -172,7 +189,7 @@ var app = angular
         resolve: {
           loadMyFile:function($ocLazyLoad) {
             return $ocLazyLoad.load({
-                name:'sbAdminApp',
+                name:'marketApp',
                 files:['scripts/controllers/sectorContoller.js']
             })
           }
@@ -184,7 +201,7 @@ var app = angular
         resolve: {
           loadMyFile:function($ocLazyLoad) {
             return $ocLazyLoad.load({
-                name:'sbAdminApp',
+                name:'marketApp',
                 files:['scripts/controllers/favContoller.js']
             })
           }
@@ -196,7 +213,7 @@ var app = angular
         resolve: {
           loadMyFile:function($ocLazyLoad) {
             return $ocLazyLoad.load({
-                name:'sbAdminApp',
+                name:'marketApp',
                 files:['scripts/controllers/newsContoller.js']
             })
           }
@@ -218,7 +235,7 @@ var app = angular
               ]
             }),
             $ocLazyLoad.load({
-                name:'sbAdminApp',
+                name:'marketApp',
                 files:['scripts/controllers/chartContoller.js']
             })
           }
@@ -232,11 +249,10 @@ var app = angular
     // keep user logged in after page refresh
     $rootScope.globals = $cookieStore.get('globals') || {};
     $rootScope.navigator = $location.url();
-    if ($rootScope.globals.currentUser) {
-      $http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata; // jshint ignore:line
-    }
 
-    console.log($rootScope.globals);
+    if ($rootScope.globals.currentUser) {
+      $http.defaults.headers.common['Authorization'] = 'Basic ' + $rootScope.globals.currentUser.authdata;
+    }
 
     $rootScope.$on('$locationChangeStart', function (event, next, current) {
       var navStack = [];
@@ -249,11 +265,13 @@ var app = angular
           name: path[i]
         });
       }
+
       $rootScope.navigator = navStack;
 
       // redirect to login page if not logged in
       if ($location.path() !== '/login' && !AuthenticationService.isAuthenticated()) {
-          $location.path('login');
+        $rootScope.lastvisit = next.split('#')[1];
+        $location.path('login');
       }
     });
   }]);

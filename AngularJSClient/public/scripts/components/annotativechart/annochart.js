@@ -1,4 +1,4 @@
-angular.module('sbAdminApp').directive('annochart', function() {
+angular.module('marketApp').directive('annochart', function() {
   return {
     templateUrl: 'scripts/components/annotativechart/annochart.html',
     replace: true,

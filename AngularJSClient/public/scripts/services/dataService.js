@@ -3,7 +3,7 @@ angular.module('servData', []).factory(
   function($http, $rootScope) {
     return function(indices, onSuccess){
       var query = $rootScope.host + 'api/list/' + indices;
-      $http.get(query).success(function(data){
+      $http.get(query, { cache: true }).success(function(data){
         onSuccess(data);
       });
     }
@@ -13,7 +13,7 @@ angular.module('servData', []).factory(
   function($http, $rootScope) {
     return function(symbol, onSuccess){
       var query = $rootScope.host + 'api/history/stock/' + symbol;
-      $http.get(query).success(function(data){
+      $http.get(query, { cache: true }).success(function(data){
         onSuccess(data);
       });
     }
@@ -23,7 +23,7 @@ angular.module('servData', []).factory(
   function($http, $rootScope) {
     return function(sector, onSuccess){
       var query = $rootScope.host + 'api/history/sector/' + sector;
-      $http.get(query).success(function(data){
+      $http.get(query, { cache: true }).success(function(data){
         onSuccess(data);
       });
     }
@@ -43,7 +43,7 @@ angular.module('servData', []).factory(
   function($http, $rootScope) {
     return function(onSuccess){
       var query = $rootScope.host + 'api/sector/list/';
-      $http.get(query).success(function(data){
+      $http.get(query, { cache: true }).success(function(data){
         onSuccess(data);
       });
     }
@@ -53,7 +53,7 @@ angular.module('servData', []).factory(
   function($http, $rootScope) {
     return function(userid, onSuccess){
       var query = $rootScope.host + 'api/news/' + userid;
-      $http.get(query).success(function(data){
+      $http.get(query, { cache: true }).success(function(data){
         onSuccess(data);
       });
     }
@@ -83,6 +83,16 @@ angular.module('servData', []).factory(
   function($http, $rootScope) {
     return function(onSuccess){
       var query = $rootScope.host + 'api/nt/';
+      $http.get(query).success(function(data){
+        onSuccess(data);
+      });
+    }
+  }]
+).factory(
+  'search', ['$http', '$rootScope',
+  function($http, $rootScope) {
+    return function(text, onSuccess){
+      var query = $rootScope.host + 'api/search/' + text;
       $http.get(query).success(function(data){
         onSuccess(data);
       });

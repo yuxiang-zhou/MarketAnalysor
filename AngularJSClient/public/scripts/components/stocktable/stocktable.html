@@ -2,24 +2,24 @@
   <thead>
     <tr>
       <th>Like</th>
-      <th>Symbol</th>
-      <th>Name</th>
-      <th>Market Cap. (£ m)</th>
-      <th>Profit (£ m)</th>
-      <th>M/P Ratio</th>
-      <th>P/E</th>
-      <th>EMS - Liquidity (£)</th>
-      <th>Price (£ p) - Spread (%)</th>
-      <th>Dividend (£ p)</th>
-      <th>Net Debt (£ m) - D/P Ratio</th>
-      <th>Profit Trend</th>
-      <th>Divident Trend</th>
-      <th>Debt Trend</th>
-      <th>Sector</th>
+      <th ng-click="order('fields.Symbol')" class='clickable'>Symbol<span  ng-if='predicate == "fields.Symbol"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.Name')" class='clickable'>Name<span  ng-if='predicate == "fields.Name"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.MarketCap')" class='clickable'>Market Cap. (£ m)<span  ng-if='predicate == "fields.MarketCap"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.Profit')" class='clickable'>Profit (£ m)<span  ng-if='predicate == "fields.Profit"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.MPRatio')" class='clickable'>M/P Ratio<span  ng-if='predicate == "fields.MPRatio"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.PE')" class='clickable'>P/E<span  ng-if='predicate == "fields.PE"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.EMS')" class='clickable'>EMS - Liquidity (£)<span  ng-if='predicate == "fields.EMS"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.Bid')" class='clickable'>Price (£ p) - Spread (%)<span  ng-if='predicate == "fields.Bid"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.Dividend')" class='clickable'>Dividend (£ p)<span  ng-if='predicate == "fields.Dividend"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.DPRatio')" class='clickable'>Net Debt (£ m) - D/P Ratio<span  ng-if='predicate == "fields.DPRatio"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.ProfitTrend')" class='clickable'>Profit Trend<span  ng-if='predicate == "fields.ProfitTrend"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.DividendTrend')" class='clickable'>Divident Trend<span  ng-if='predicate == "fields.DividendTrend"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.DebtTrend')" class='clickable'>Debt Trend<span  ng-if='predicate == "fields.DebtTrend"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
+      <th ng-click="order('fields.Sector')" class='clickable'>Sector<span  ng-if='predicate == "fields.Sector"' class="sortorder" ng-class="{reverse:reverse}"></span></th>
     </tr>
   </thead>
   <tbody>
-    <tr class='clickable-row' ng-repeat="obj in ftse" ng-animate="{enter: 'animate-enter', leave: 'animate-leave'}">
+    <tr class='clickable animate-repeat' ng-repeat="obj in ftse|orderBy:predicate:reverse">
       <td><fav symbol='obj.fields.Symbol'></fav></td>
       <td ui-sref="dashboard.detail({symbol: obj.fields.Symbol})">{{obj.fields.Symbol}}</td>
       <td ui-sref="dashboard.detail({symbol: obj.fields.Symbol})">{{obj.fields.Name}}</td>

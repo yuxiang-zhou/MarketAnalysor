@@ -1,0 +1,16 @@
+<table class="table table-striped table-bordered table-hover display" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Title</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="news in newslist">
+      <td><a ui-sref="dashboard.detail({symbol: news.symbol})">{{news.symbol}}</a></td>
+      <td><a href="{{news.url}}">{{news.title}}</a></td>
+      <td><small class="pull-right text-muted"><i class="fa fa-clock-o fa-fw"></i>{{news.pub_date}}</small></td>
+    </tr>
+  </tbody>
+</table>

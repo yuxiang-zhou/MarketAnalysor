@@ -84,7 +84,7 @@ class StockNews(models.Model):
 
 class SectorHistory(models.Model):
     Sector = models.CharField(max_length=100, default='')
-    Symbol = models.CharField(max_length=20, default='')
+    Symbol = models.CharField(max_length=100, default='')
     Open = models.FloatField(default=0)
     Close = models.FloatField(default=0)
     High = models.FloatField(default=0)
