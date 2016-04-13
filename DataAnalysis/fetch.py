@@ -38,6 +38,7 @@ if __name__ == '__main__':
     # parse arguments
 
     parser = argparse.ArgumentParser(description='Stock Fetching')
+    parser.add_argument('-a', dest='stock_list_update', default=False, help='Stock List Update', action="store_true")
     parser.add_argument('-i', dest='stock_info_list', default=False, help='Stock Infomation List', action="store_true")
     parser.add_argument('-l', dest='stock_history_list', default=False, help='Stock History List', action="store_true")
     parser.add_argument('-n', dest='stock_news_list', default=False, help='Stock News List', action="store_true")
@@ -52,20 +53,17 @@ if __name__ == '__main__':
     dt = timezone.now()
     fn = '{:04d}{:02d}{:02d}.pkl'.format(dt.year,dt.month,dt.day)
 
-    if os.path.isfile(fn):
-        ALL_Stocks = pickle.load(open(fn, "rb"))
-    else:
-        ALL_Stocks = getLSEList(collection=Stock)
-        pickle.dump(ALL_Stocks, open(fn, "wb"))
-
-    symbols = [s['symbol'] for s in ALL_Stocks]
+    ALL_Stocks = []
     for s in Stock.objects.all():
-        if not s.Symbol in symbols:
-            ALL_Stocks.append({
-                "symbol": s.Symbol,
-                "name": s.Name,
-                "query": s.Query,
-            })
+        ALL_Stocks.append({
+            "symbol": s.Symbol,
+            "name": s.Name,
+            "query": s.Query,
+        })
+
+    def get_share_list():
+        getLSEList(collection=Stock)
+
 
     def get_share_info():
         for share in ALL_Stocks:
@@ -129,6 +127,8 @@ if __name__ == '__main__':
 
     threads = []
     callables = []
+    if args.stock_list_update:
+        callables.append(get_share_list)
     if args.stock_info_list:
         callables.append(get_share_info)
     if args.stock_history_list:

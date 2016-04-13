@@ -6,6 +6,9 @@ import json
 from django.utils import timezone
 from tools import get_slope
 from tools import safe_request
+import itertools
+
+query_url = 'http://www.londonstockexchange.com/exchange/prices/stocks/summary/fundamentals.html?fourWayKey={}'
 
 def get_info(symbol):
     info_query = 'https://www.google.co.uk/finance?q={}'
@@ -50,6 +53,36 @@ def get_info(symbol):
     return info
 
 
+def getLSEURLSymbol(symbol, collection=None):
+    url = 'http://www.londonstockexchange.com/exchange/searchengine/search.html?q={}&page={}'
+
+    new_query = ""
+    for p in itertools.count(start=1):
+        html = safe_request(url.format(symbol, p))
+        soup = BeautifulSoup(html, 'html.parser')
+        table = soup.find('table', class_='table_dati')
+        if table and not new_query:
+            for tr in table.find('tbody').find_all('tr'):
+                [sSymbol, sLink, sType] = tr.find_all('td')[:3]
+                type = sType.string.strip()
+                if type != 'Stocks':
+                    continue
+                check = ''.join(map(lambda x: x if isinstance(x,str) else x.string, sSymbol.contents)).strip()
+                if check == symbol.upper():
+                    href = sLink.find('a')['href']
+                    new_query = href.split('.html')[0].split('/')[-1]
+                    if collection:
+                        obj = collection.objects.get(Symbol=symbol)
+                        obj.Query = new_query
+                        obj.save()
+                    break
+
+        else:
+            break
+
+    return new_query
+
+
 def getLSEInfo(query,symbol,collection=None):
 
     def valid_str(input_str):
@@ -57,22 +90,36 @@ def getLSEInfo(query,symbol,collection=None):
         return input_str
 
     def valid_num(input_str):
-        input_str = re.sub('[^0-9.-]+', '', input_str)
+        try:
+            input_str = re.sub('[^0-9.-]+', '', input_str)
 
-        if len(input_str) and input_str != '-':
-            return float(input_str)
+            if len(input_str) and input_str != '-':
+                return float(input_str)
+        except:
+            pass
         return 0.0
 
     header = {'User-Agent': 'Mozilla/5.0'}
 
     info = {}
 
-    url = 'http://www.londonstockexchange.com/exchange/prices/stocks/summary/fundamentals.html?fourWayKey={}'
-    html = safe_request(url.format(query))
-    soup = BeautifulSoup(html, 'html.parser')
-    try:
-        tIncome,tBalance,tRatio,tCompany,tTrading = soup.find_all('table')
-    except:
+    querys = [
+        query,
+        getLSEURLSymbol(symbol, collection=collection)
+    ]
+
+    found = False
+    for query in querys:
+        try:
+            html = safe_request(query_url.format(query))
+            soup = BeautifulSoup(html, 'html.parser')
+            tIncome,tBalance,tRatio,tCompany,tTrading = soup.find_all('table')
+            found = True
+            break
+        except:
+            continue
+
+    if not found:
         print 'Data not Available'
         return info
 
@@ -156,7 +203,7 @@ def getLSEInfo(query,symbol,collection=None):
     bid = info['Summary']['Bid']
     stats['Spread'] = 100 * (offer - bid) / bid if bid > 0 else 99
     stats['Dividend'] = info['Ratio']['DividendYield'][-1]
-    stats['NetDebt'] = info['Balance']['Borrowings'][-1]
+    stats['NetDebt'] = info['Balance']['TotalLiabilities'][-1]
     try:
         stats['Price'] = info['Summary']['PriceGBX']
     except:
@@ -170,7 +217,7 @@ def getLSEInfo(query,symbol,collection=None):
     info['stats'] = stats
 
     if collection:
-        obj, created = collection.objects.get_or_create(Query=query, Symbol=symbol)
+        obj, created = collection.objects.get_or_create(Symbol=symbol)
         obj.MarketCap = stats['MarketCap']
         obj.Profit = stats['Profit']
         obj.MPRatio = stats['MPRatio']
@@ -188,7 +235,7 @@ def getLSEInfo(query,symbol,collection=None):
         obj.Catagory = info['Trading']['FTSEindex']
         obj.ProfitTrend = get_slope(info['Income']['ProfitBeforeTax'])
         obj.DividendTrend = get_slope(info['Ratio']['DividendYield'])
-        obj.DebtTrend = get_slope(info['Balance']['Borrowings'])
+        obj.DebtTrend = get_slope(info['Balance']['TotalLiabilities'])
         obj.pub_date = timezone.now()
         obj.save()
 
@@ -196,4 +243,6 @@ def getLSEInfo(query,symbol,collection=None):
 
 
 if __name__ == '__main__':
-    print json.dumps(getLSEInfo('GB00BJTNFH41GBGBXSTMM'))
+    # print getLSEURLSymbol('aaa')
+
+    print json.dumps(getLSEInfo('GI000A0F6407GBGBXSTMM','888'))

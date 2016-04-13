@@ -67,7 +67,11 @@ def getLSEList(collection=None):
                 lists.append(info)
 
                 if collection:
-                    obj, created = collection.objects.get_or_create(Symbol=info['symbol'])
+                    objs = collection.objects.filter(Symbol=info['symbol'])
+                    if objs.count() > 1:
+                        for q in objs.order_by("-pub_date")[1:]:
+                            q.delete()
+                    obj, _ = objs.get_or_create(Symbol=info['symbol'])
                     obj.Query = info['query']
                     obj.Name = info['name']
                     obj.pub_date = timezone.now()

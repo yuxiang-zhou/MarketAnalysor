@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
         if dt.day != day_last and hour_now > 10:
             day_last = dt.day
+            subprocess.call(["python", "fetch.py" , "-a"])
             subprocess.call(["python", "fetch.py" , "-il"])
             subprocess.call(["python", "fetch.py" , "-s"])
             subprocess.call(["python", "analysis.py" , "-p"])
